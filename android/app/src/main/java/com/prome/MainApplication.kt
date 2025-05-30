@@ -1,4 +1,4 @@
-package com.prome_fe
+package com.prome
 
 import android.app.Application
 import com.facebook.react.PackageList
