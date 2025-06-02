@@ -1,5 +1,5 @@
 import React from 'react';
-import { Text, Image, Button, ScrollView } from 'react-native';
+import { Alert, Text, Image, Button, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const DiagScreen = () => {
@@ -14,7 +14,7 @@ const DiagScreen = () => {
                 <Text>Step 4</Text>
             </ScrollView>
 
-            <Button>검사 결과로 ai 챗봇에게 물어보기</Button>
+            <Button title="검사 결과로 ai 챗봇에게 물어보기" onPress={() => { Alert.alert('버튼 누름!'); }}/>
         </SafeAreaView>
     );
 };
