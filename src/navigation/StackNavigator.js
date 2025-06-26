@@ -13,6 +13,7 @@ import DescriptionScreen from '../views/screens/etc/DescriptionScreen';
 import MainScreen from '../views/screens/etc/MainScreen';
 
 import CalendarScreen from '../views/screens/calendar/CalendarScreen';
+import CallScreen from '../views/screens/hospital/CallScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -48,8 +49,12 @@ const StackNavigator = () => {
                 options={{ headerShown: true, animation: 'none'}}
             />
             <Stack.Screen name="Calendar"
-            component={CalendarScreen}
-            options={{ headerShown: true, animation: 'none'}}
+                component={CalendarScreen}
+                options={{ headerShown: true, animation: 'none'}}
+            />
+            <Stack.Screen name="Call"
+                component={CallScreen}
+                options={{ headerShown: true, animation: 'none' }}
             />
         </Stack.Navigator>
 

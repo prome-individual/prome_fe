@@ -34,6 +34,13 @@ const MainScreen = ({ navigation }) => {
                 navigation.navigate('Login'); }}
             />
 
+            <Text>캘린더 가기</Text>
+            <Button title="캘린더" onPress={() => {
+                Alert.alert('버튼 누름!');
+                navigation.navigate('Calendar'); }}
+            />
+
+
 
         </SafeAreaView>
     );

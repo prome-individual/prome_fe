@@ -1,4 +1,5 @@
 import Config from 'react-native-config';
 
-const BASE_URL = Config.BASE_URL;
-export default BASE_URL;
+export const BASE_URL = Config.BASE_URL;
+export const SOCKET_PORT = Config.SOCKET_PORT;
+export const UPLOAD_PORT = Config.UPLOAD_PORT;
