@@ -1,1 +1,1 @@
-import { BASE_URL } from '../config/config';
+import BASE_URL from '../config/config';
