@@ -20,6 +20,14 @@ const LoginScreen = ({ navigation }) => {
                 Alert.alert('버튼 누름!');
                 navigation.navigate('Register'); }}
             />
+            <Button title="채팅페이지" onPress={() => {
+                navigation.navigate('Chat');
+            }}
+            />
+            <Button title="이전기록" onPress={() => {
+                navigation.navigate('ChatPeriod');
+            }}
+            />
         </SafeAreaView>
 
     );

@@ -9,7 +9,7 @@ const App = () => {
   return (
     <SafeAreaProvider>
         <StatusBar
-          backgroundColor="red"
+          backgroundColor="blue"
           barStyle="light-content"
         />
         <NavigationContainer>

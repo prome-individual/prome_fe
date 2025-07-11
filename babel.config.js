@@ -1,4 +1,11 @@
 module.exports = {
-  presets: ['module:@react-native/babel-preset'],
-
+  presets: ['@react-native/babel-preset'],
+  plugins: [
+    [
+      'babel-plugin-styled-components',
+      {
+        native: true,
+      },
+    ],
+  ],
 };

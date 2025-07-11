@@ -3,6 +3,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 import LoginScreen from '../views/screens/auth/LoginScreen';
 import RegisterScreen from '../views/screens/auth/RegisterScreen';
+import OKScreen from '../views/screens/auth/OKScreen';
 
 import ChatRoomScreen from '../views/screens/chat/ChatRoomScreen';
 import ChatPeriodSelectScreen from '../views/screens/chat/ChatPeriodSelectScreen';
@@ -22,43 +23,45 @@ const StackNavigator = () => {
         <Stack.Navigator initialRouteName="Login">
             <Stack.Screen name="Login"
                 component={LoginScreen}
-                options={{ headerShown: true, animation: 'none'}}
+                options={{ headerShown: false, animation: 'none'}}
             />
             <Stack.Screen name="Register"
                 component={RegisterScreen}
-                options={{ headerShown: true, animation: 'none'}}
+                options={{ headerShown: false, animation: 'none'}}
+            />
+            <Stack.Screen name="OK"
+                component={OKScreen}
+                options={{headerShown: false, animation: 'none'}}
             />
             <Stack.Screen name="Chat"
                 component={ChatRoomScreen}
-                options={{ headerShown: true, animation: 'none'}}
+                options={{ headerShown: false, animation: 'none'}}
             />
             <Stack.Screen name="ChatPeriod"
                 component={ChatPeriodSelectScreen}
-                options={{ headerShown: true, animation: 'none'}}
+                options={{ headerShown: false, animation: 'none'}}
             />
             <Stack.Screen name="Diag"
                 component={DiagScreen}
-                options={{ headerShown: true, animation: 'none'}}
+                options={{ headerShown: false, animation: 'none'}}
             />
             <Stack.Screen name="Description"
                 component={DescriptionScreen}
-                options={{ headerShown: true, animation: 'none'}}
+                options={{ headerShown: false, animation: 'none'}}
             />
             <Stack.Screen name="Main"
                 component={MainScreen}
-                options={{ headerShown: true, animation: 'none'}}
+                options={{ headerShown: false, animation: 'none'}}
             />
             <Stack.Screen name="Calendar"
                 component={CalendarScreen}
-                options={{ headerShown: true, animation: 'none'}}
+                options={{ headerShown: false, animation: 'none'}}
             />
             <Stack.Screen name="Call"
                 component={CallScreen}
-                options={{ headerShown: true, animation: 'none' }}
+                options={{ headerShown: false, animation: 'none' }}
             />
         </Stack.Navigator>
-
-        // navigation.pop() 발생 시 => 자동으로 반대로 됨
     );
 };
 
