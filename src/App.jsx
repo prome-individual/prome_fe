@@ -4,13 +4,14 @@ import { SafeAreaProvider  } from 'react-native-safe-area-context';
 import { NavigationContainer } from '@react-navigation/native';
 import StackNavigator from './navigation/StackNavigator';
 import { StatusBar } from 'react-native';
+import Colors from './views/styles/Colors';
 
 const App = () => {
   return (
     <SafeAreaProvider>
         <StatusBar
-          backgroundColor="blue"
-          barStyle="light-content"
+          backgroundColor={Colors.background.bg}
+          barStyle="dark-content"
         />
         <NavigationContainer>
         <StackNavigator />

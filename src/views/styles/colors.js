@@ -9,6 +9,7 @@ const Colors = {
     background: {
         bg: '#F6FDFF',
         gradient: ['#ffffff', '#fc4646', '#fe4443'],
+        gradientReverse: ['#fe4443', '#fc4646', '#ffffff'],
         opacity: 0.69,
     },
 

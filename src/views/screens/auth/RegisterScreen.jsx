@@ -1,40 +1,98 @@
 import React, { useState } from 'react';
-import { Alert } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import styled from 'styled-components/native';
+import styled from 'styled-components';
+import Colors from '../../styles/Colors';
 import Back from '../../common/Back';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import LinearGradient from 'react-native-linear-gradient';
+import { TouchableOpacity, ScrollView } from 'react-native';
 
-const Container = styled(SafeAreaView)`
+const SafeView = styled(SafeAreaView)`
     flex: 1;
-    background-color: white;
 `;
 
-const ScrollContainer = styled.ScrollView`
+const Container = styled.View`
+    background-color: ${Colors.background.bg};
     flex: 1;
-    padding: 20px;
+`;
+
+const Top = styled.View`
+    height: 15%;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+`;
+
+const Gradient = styled(LinearGradient).attrs({
+    colors: Colors.background.gradientReverse,
+    start: {x: 0, y: 0},
+    end: {x: 0, y: 1},
+    opacity: 0.14,
+})`
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
 `;
 
 const Title = styled.Text`
-    text-align: center;
     font-size: 28px;
-    font-weight: 600;
-`;
-
-const InputContainer = styled.View`
-    margin-bottom: 20px;
-`;
-
-const Label = styled.Text`
-    font-size: 16px;
     font-weight: 600;
     color: #333;
     margin-bottom: 8px;
 `;
 
+const Subtitle = styled.Text`
+    font-size: 16px;
+    color: #666;
+    text-align: center;
+`;
+
+const FormContainer = styled(ScrollView)`
+    flex: 1;
+    padding: 20px;
+    background-color: ${Colors.background.bg};
+`;
+
+const StepContainer = styled.View`
+    margin-bottom: 24px;
+    padding-top: 24px;
+`;
+
+const StepHeader = styled.View`
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 12px;
+`;
+
+const StepNumber = styled.View`
+    width: 24px;
+    height: 24px;
+    border-radius: 12px;
+    background-color: ${Colors.primary};
+    justify-content: center;
+    align-items: center;
+    margin-right: 8px;
+`;
+
+const StepNumberText = styled.Text`
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+`;
+
+const StepTitle = styled.Text`
+    font-size: 16px;
+    font-weight: 500;
+    color: #333;
+`;
+
 const Input = styled.TextInput`
-    border: 1px solid #ddd;
+    width: 100%;
+    height: 50px;
+    border: 1px solid ${Colors.primary};
     border-radius: 8px;
-    padding: 12px 16px;
+    padding: 0 16px;
     font-size: 16px;
     background-color: white;
     color: #333;
@@ -42,113 +100,143 @@ const Input = styled.TextInput`
 
 const GenderContainer = styled.View`
     flex-direction: row;
-    gap: 10px;
+    gap: 12px;
 `;
 
-const GenderButton = styled.TouchableOpacity`
+const GenderButton = styled(TouchableOpacity)`
     flex: 1;
-    padding: 12px;
-    border: 1px solid ${props => props.selected ? '#BF4F74' : '#ddd'};
-    background-color: ${props => props.selected ? '#BF4F74' : 'white'};
+    height: 50px;
+    border: 1px solid ${Colors.primary};
     border-radius: 8px;
+    justify-content: center;
     align-items: center;
+    background-color: ${props => props.selected ? '#DEF3FB' : 'white'};
 `;
 
 const GenderText = styled.Text`
     font-size: 16px;
-    color: ${props => props.selected ? 'white' : '#333'};
-    font-weight: ${props => props.selected ? '600' : '400'};
+    font-weight: 500;
+    color: black;
 `;
 
-const Button = styled.TouchableOpacity`
-    background-color: #BF4F74;
-    padding: 16px 32px;
+const SubmitButton = styled(TouchableOpacity)`
+    background-color: ${Colors.primary};
+    height: 50px;
     border-radius: 8px;
-    margin: 20px;
-    align-items: center;
     justify-content: center;
+    align-items: center;
+    margin: 20px;
+    margin-top: 40px;
 `;
 
-const ButtonText = styled.Text`
+const SubmitButtonText = styled.Text`
     color: white;
-    font-size: 16px;
+    font-size: 18px;
     font-weight: 600;
+`;
+
+const Bold = styled.Text`
+    font-weight: 700;
 `;
 
 const RegisterScreen = ({ navigation }) => {
     const [selectedGender, setSelectedGender] = useState('');
+    const [name, setName] = useState('');
+    const [age, setAge] = useState('');
+    const [phone, setPhone] = useState('');
 
     return (
-        <Container>
-            <Back navigation={navigation} />
-            <ScrollContainer>
-                <Title>회원가입</Title>
-                <InputContainer>
-                    <Label>ID</Label>
-                    <Input
-                        placeholder="아이디를 입력하세요"
-                        autoCapitalize="none"
-                    />
-                </InputContainer>
+        <SafeView>
+            <Container>
+                <Back navigation={navigation} />
+                <Top>
+                    <Gradient />
+                    <Title>회원가입</Title>
+                    <Subtitle>회원가입으로 필요한 정보를 얻을 수 있어요 !</Subtitle>
+                </Top>
+                <FormContainer showsVerticalScrollIndicator={false}>
+                    <StepContainer>
+                        <StepHeader>
+                            <StepNumber>
+                                <StepNumberText>1</StepNumberText>
+                            </StepNumber>
+                            <StepTitle><Bold>성함</Bold>을 알려주세요</StepTitle>
+                        </StepHeader>
+                        <Input
+                            placeholder="이름을 입력해주세요"
+                            value={name}
+                            onChangeText={setName}
+                        />
+                    </StepContainer>
 
-                <InputContainer>
-                    <Label>PASSWORD</Label>
-                    <Input
-                        placeholder="비밀번호를 입력하세요"
-                        secureTextEntry={true}
-                    />
-                </InputContainer>
+                    <StepContainer>
+                        <StepHeader>
+                            <StepNumber>
+                                <StepNumberText>2</StepNumberText>
+                            </StepNumber>
+                            <StepTitle><Bold>성별</Bold>을 알려주세요</StepTitle>
+                        </StepHeader>
+                        <GenderContainer>
+                            <GenderButton
+                                selected={selectedGender === '남자'}
+                                onPress={() => setSelectedGender('남자')}
+                            >
+                                <GenderText selected={selectedGender === '남자'}>
+                                    남자
+                                </GenderText>
+                            </GenderButton>
+                            <GenderButton
+                                selected={selectedGender === '여자'}
+                                onPress={() => setSelectedGender('여자')}
+                            >
+                                <GenderText selected={selectedGender === '여자'}>
+                                    여자
+                                </GenderText>
+                            </GenderButton>
+                        </GenderContainer>
+                    </StepContainer>
 
-                <InputContainer>
-                    <Label>NAME</Label>
-                    <Input
-                        placeholder="이름을 입력하세요"
-                    />
-                </InputContainer>
+                    <StepContainer>
+                        <StepHeader>
+                            <StepNumber>
+                                <StepNumberText>3</StepNumberText>
+                            </StepNumber>
+                            <StepTitle><Bold>나이</Bold>를 알려주세요</StepTitle>
+                        </StepHeader>
+                        <Input
+                            placeholder="나이를 입력해주세요"
+                            value={age}
+                            onChangeText={setAge}
+                            keyboardType="numeric"
+                        />
+                    </StepContainer>
 
-                <InputContainer>
-                    <Label>GENDER</Label>
-                    <GenderContainer>
-                        <GenderButton
-                            selected={selectedGender === '남자'}
-                            onPress={() => setSelectedGender('남자')}
-                        >
-                            <GenderText selected={selectedGender === '남자'}>
-                                남자
-                            </GenderText>
-                        </GenderButton>
-                        <GenderButton
-                            selected={selectedGender === '여자'}
-                            onPress={() => setSelectedGender('여자')}
-                        >
-                            <GenderText selected={selectedGender === '여자'}>
-                                여자
-                            </GenderText>
-                        </GenderButton>
-                    </GenderContainer>
-                </InputContainer>
+                    <StepContainer>
+                        <StepHeader>
+                            <StepNumber>
+                                <StepNumberText>4</StepNumberText>
+                            </StepNumber>
+                            <StepTitle><Bold>전화번호</Bold>를 알려주세요</StepTitle>
+                        </StepHeader>
+                        <Input
+                            placeholder="전화번호를 입력해주세요"
+                            value={phone}
+                            onChangeText={setPhone}
+                            keyboardType="phone-pad"
+                        />
+                    </StepContainer>
 
-                <InputContainer>
-                    <Label>PHONE</Label>
-                    <Input
-                        placeholder="전화번호를 입력하세요"
-                        keyboardType="phone-pad"
-                    />
-                </InputContainer>
-            </ScrollContainer>
-
-            <Button onPress={() => {
-                Alert.alert('버튼 누름!', `선택된 성별 : ${selectedGender}`);
-                navigation.navigate('Login');
-            }}>
-                <ButtonText>완료</ButtonText>
-            </Button>
-            <Button onPress={() => {
-                navigation.navigate('OK');
-            }}>
-                <ButtonText>다음</ButtonText>
-            </Button>
-        </Container>
+                    <SubmitButton
+                        onPress={() => {
+                            console.log('회원가입 데이터:', { name, selectedGender, age, phone });
+                            navigation.navigate('OK');
+                        }}
+                    >
+                        <SubmitButtonText>다음</SubmitButtonText>
+                    </SubmitButton>
+                </FormContainer>
+            </Container>
+        </SafeView>
     );
 };
 
