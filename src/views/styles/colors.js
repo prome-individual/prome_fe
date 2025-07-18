@@ -41,6 +41,8 @@ const Colors = {
         path: '#FE4443',
         opacity: 0.3,
     },
+    sky: '#DDF8FF',
+    buttonWrapper: '#F4F4F4',
 };
 
 export default Colors;
