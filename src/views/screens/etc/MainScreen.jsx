@@ -36,6 +36,7 @@ const TopText = styled.Text`
 const ExpText = styled.Text`
     color: black;
     font-size: 18px;
+    font-weight: 600;
     margin-top: 10%;
     margin-left: 5%;
 `;
@@ -56,12 +57,27 @@ const QuestionLeft = styled(TouchableOpacity)`
     justify-content: center;
     border-radius: 12px;
     border: 1px solid ${Colors.primary};
+    overflow: hidden;
+`;
+
+const QuestionTextWrapper = styled.View`
+    flex-direction: row;
+    top: 10%;
+    left: 10%;
 `;
 
 const QuestionLeftText = styled.Text`
     font-size: 18px;
+    font-weight: 600;
     text-align: center;
-    color: black;
+    color: black;  
+`;
+
+const QuestionLeftTextSmile = styled(Image)`
+    width: 16px;
+    resize-mode: contain;
+    margin-left: 5px;
+    margin-top: 3px;
 `;
 
 const QuestionRightWrapper = styled.View`
@@ -70,7 +86,50 @@ const QuestionRightWrapper = styled.View`
     gap: 10px;
 `;
 
-const QuestionRight = styled(TouchableOpacity)`
+const QuestionRight1 = styled(TouchableOpacity)`
+    flex: 1;
+    justify-content: center;
+    border-radius: 12px;
+    padding: 10px;
+    border: 1px solid ${Colors.primary};
+`;
+
+const QuestionIcon = styled(Image)`
+    position: absolute;
+`;
+
+const KongDot = styled(Image)`
+    position: absolute;
+    bottom: 5;
+    right: -20;
+`;
+
+const KongVector = styled(Image)`
+    position: absoulte;
+    left: 65;
+    bottom: -40;
+    width: 40px;
+    resize-mode: contain;
+`;
+
+
+const KongReverseWrapper = styled.View`
+    border-radius: 24px;
+    background-color: ${Colors.primary};
+    width: 44px;
+    height: 44px;
+    margin-bottom: 13%;
+    justify-content: center;
+`;
+
+const KongReverse = styled(Image)`
+    width: 33px;
+    height: 33px;
+    resize-mode: contain;
+    align-self: center;
+`;
+
+const QuestionRight2 = styled(TouchableOpacity)`
     flex: 1;
     justify-content: center;
     border-radius: 12px;
@@ -79,9 +138,11 @@ const QuestionRight = styled(TouchableOpacity)`
 `;
 
 const QuestionRightText = styled.Text`
+    position: absolute;
     font-size: 14px;
-    text-align: center;
     color: black;
+    bottom: 7;
+    right: 10;
 `;
 
 const Red = styled.Text`
@@ -129,15 +190,30 @@ const MainScreen = ({ navigation }) => {
                 <ExpText>AI 챗봇에게 질문해보세요!</ExpText>
                 <QuestionWrapper>
                     <QuestionLeft>
-                        <QuestionLeftText>즉시 답해드려요</QuestionLeftText>
+                        <QuestionTextWrapper>
+                            <QuestionLeftText>즉시 답해드려요</QuestionLeftText>
+                            <QuestionLeftTextSmile source={require('../../../assets/smile.png')} alt="스마일" />
+                        </QuestionTextWrapper>
+                        <KongDot source={require('../../../assets/kong_dot.png')} alt="점선콩" />
+                        <KongVector source={require('../../../assets/vector_left.png')} alt="콩벡터" />
+                        <Red style={{ position: 'absolute', bottom: 4, left: 20, fontSize: 12}}>with 콩콩봇</Red>
                     </QuestionLeft>
                     <QuestionRightWrapper>
-                        <QuestionRight>
+                        <QuestionRight1>
+                            <QuestionIcon source={require('../../../assets/question.png')} alt="물음표"/>
+                            <QuestionIcon style={{ bottom: 10, left: 18 }} source={require('../../../assets/eclip.png')} alt="그림자"/>
+                            <QuestionIcon style={{ width: 24, height: 24, left: 40, transform: [{ rotate: '45deg' }] }} source={require('../../../assets/question.png')} alt="물음표"/>
+                            <QuestionIcon style={{ bottom: 20, left: 38 }} source={require('../../../assets/eclip.png')} alt="그림자"/>
+                            <QuestionIcon style={{ width: 30, height: 30, top: 10, right: 10, transform: [{ rotate: '45deg' }], opacity: 0.64 }} source={require('../../../assets/question.png')} alt="물음표"/>
+                            <QuestionIcon style={{ top: 42, right: 20, opacity: 0.64 }} source={require('../../../assets/eclip.png')} alt="그림자"/>
                             <QuestionRightText>가장 많이 한 질문</QuestionRightText>
-                        </QuestionRight>
-                        <QuestionRight>
-                            <QuestionRightText><Red>콩콩봇이란 ?</Red></QuestionRightText>
-                        </QuestionRight>
+                        </QuestionRight1>
+                        <QuestionRight2>
+                            <QuestionRightText><Red style={{ fontWeight: 600 }}>콩콩봇이란 ?</Red></QuestionRightText>
+                            <KongReverseWrapper>
+                                <KongReverse source={require('../../../assets/kong_reverse.png')} alt="콩리버스" />
+                            </KongReverseWrapper>
+                        </QuestionRight2>
                     </QuestionRightWrapper>
                 </QuestionWrapper>
                 <Wrap style={{ height: '7%' }}>
@@ -154,7 +230,7 @@ const MainScreen = ({ navigation }) => {
                         <SelectText selected={selectedTab === '이전기록'}>이전 기록들</SelectText>
                     </Select>
                 </Wrap>
-                <Wrap style={{ height: '21%' }}>
+                <Wrap style={{ height: '23%' }}>
                     {selectedTab === '병원찾기' ? <Hospital navigation={navigation} /> : selectedTab === '이전기록' ? <History navigation={navigation} /> : null}
                 </Wrap>
                 <TabBar navigation={navigation} />
