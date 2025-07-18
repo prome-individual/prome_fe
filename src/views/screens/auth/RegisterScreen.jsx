@@ -1,13 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import Colors from '../../styles/Colors';
 import Back from '../../common/Back';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import LinearGradient from 'react-native-linear-gradient';
-import { TouchableOpacity, ScrollView } from 'react-native';
+import { TouchableOpacity, ScrollView, KeyboardAvoidingView, Platform, Keyboard } from 'react-native';
+import useFullScreen from '../../hooks/useFullScreen';
 
 const SafeView = styled(SafeAreaView)`
     flex: 1;
+    background-color: ${Colors.background.bg};
 `;
 
 const Container = styled.View`
@@ -16,7 +18,7 @@ const Container = styled.View`
 `;
 
 const Top = styled.View`
-    height: 15%;
+    height: ${props => props.keyboardVisible ? '10%' : '15%'};
     justify-content: center;
     align-items: center;
     position: relative;
@@ -56,7 +58,7 @@ const FormContainer = styled(ScrollView)`
 
 const StepContainer = styled.View`
     margin-bottom: 24px;
-    padding-top: 24px;
+    padding-top: 6px;
 `;
 
 const StepHeader = styled.View`
@@ -127,6 +129,7 @@ const SubmitButton = styled(TouchableOpacity)`
     align-items: center;
     margin: 20px;
     margin-top: 40px;
+    margin-bottom: ${Platform.OS === 'android' ? '40px' : '20px'};
 `;
 
 const SubmitButtonText = styled.Text`
@@ -144,97 +147,134 @@ const RegisterScreen = ({ navigation }) => {
     const [name, setName] = useState('');
     const [age, setAge] = useState('');
     const [phone, setPhone] = useState('');
+    const [keyboardVisible, setKeyboardVisible] = useState(false);
+    
+    const { enableFullScreen, disableFullScreen } = useFullScreen();
+
+    useEffect(() => {
+        // 풀스크린 활성화
+        enableFullScreen();
+        
+        // 키보드 이벤트 리스너
+        const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
+            setKeyboardVisible(true);
+        });
+        const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
+            setKeyboardVisible(false);
+        });
+
+        return () => {
+            disableFullScreen();
+            keyboardDidShowListener.remove();
+            keyboardDidHideListener.remove();
+        };
+    }, [enableFullScreen, disableFullScreen]);
 
     return (
-        <SafeView>
+        <SafeView edges={[]}>
             <Container>
-                <Back navigation={navigation} />
-                <Top>
+                <Top keyboardVisible={keyboardVisible}>
+                    <Back navigation={navigation} />
                     <Gradient />
                     <Title>회원가입</Title>
-                    <Subtitle>회원가입으로 필요한 정보를 얻을 수 있어요 !</Subtitle>
+                    {!keyboardVisible && (
+                        <Subtitle>회원가입으로 필요한 정보를 얻을 수 있어요 !</Subtitle>
+                    )}
                 </Top>
-                <FormContainer showsVerticalScrollIndicator={false}>
-                    <StepContainer>
-                        <StepHeader>
-                            <StepNumber>
-                                <StepNumberText>1</StepNumberText>
-                            </StepNumber>
-                            <StepTitle><Bold>성함</Bold>을 알려주세요</StepTitle>
-                        </StepHeader>
-                        <Input
-                            placeholder="이름을 입력해주세요"
-                            value={name}
-                            onChangeText={setName}
-                        />
-                    </StepContainer>
-
-                    <StepContainer>
-                        <StepHeader>
-                            <StepNumber>
-                                <StepNumberText>2</StepNumberText>
-                            </StepNumber>
-                            <StepTitle><Bold>성별</Bold>을 알려주세요</StepTitle>
-                        </StepHeader>
-                        <GenderContainer>
-                            <GenderButton
-                                selected={selectedGender === '남자'}
-                                onPress={() => setSelectedGender('남자')}
-                            >
-                                <GenderText selected={selectedGender === '남자'}>
-                                    남자
-                                </GenderText>
-                            </GenderButton>
-                            <GenderButton
-                                selected={selectedGender === '여자'}
-                                onPress={() => setSelectedGender('여자')}
-                            >
-                                <GenderText selected={selectedGender === '여자'}>
-                                    여자
-                                </GenderText>
-                            </GenderButton>
-                        </GenderContainer>
-                    </StepContainer>
-
-                    <StepContainer>
-                        <StepHeader>
-                            <StepNumber>
-                                <StepNumberText>3</StepNumberText>
-                            </StepNumber>
-                            <StepTitle><Bold>나이</Bold>를 알려주세요</StepTitle>
-                        </StepHeader>
-                        <Input
-                            placeholder="나이를 입력해주세요"
-                            value={age}
-                            onChangeText={setAge}
-                            keyboardType="numeric"
-                        />
-                    </StepContainer>
-
-                    <StepContainer>
-                        <StepHeader>
-                            <StepNumber>
-                                <StepNumberText>4</StepNumberText>
-                            </StepNumber>
-                            <StepTitle><Bold>전화번호</Bold>를 알려주세요</StepTitle>
-                        </StepHeader>
-                        <Input
-                            placeholder="전화번호를 입력해주세요"
-                            value={phone}
-                            onChangeText={setPhone}
-                            keyboardType="phone-pad"
-                        />
-                    </StepContainer>
-
-                    <SubmitButton
-                        onPress={() => {
-                            console.log('회원가입 데이터:', { name, selectedGender, age, phone });
-                            navigation.navigate('OK');
-                        }}
+                <KeyboardAvoidingView
+                    style={{ flex: 1 }}
+                    behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                    keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
+                >
+                    <FormContainer
+                        showsVerticalScrollIndicator={false}
+                        keyboardShouldPersistTaps="handled"
+                        contentContainerStyle={{ paddingBottom: 50 }}
                     >
-                        <SubmitButtonText>다음</SubmitButtonText>
-                    </SubmitButton>
-                </FormContainer>
+                        <StepContainer>
+                            <StepHeader>
+                                <StepNumber>
+                                    <StepNumberText>1</StepNumberText>
+                                </StepNumber>
+                                <StepTitle><Bold>성함</Bold>을 알려주세요</StepTitle>
+                            </StepHeader>
+                            <Input
+                                placeholder="이름을 입력해주세요"
+                                value={name}
+                                onChangeText={setName}
+                                returnKeyType="next"
+                            />
+                        </StepContainer>
+
+                        <StepContainer>
+                            <StepHeader>
+                                <StepNumber>
+                                    <StepNumberText>2</StepNumberText>
+                                </StepNumber>
+                                <StepTitle><Bold>성별</Bold>을 알려주세요</StepTitle>
+                            </StepHeader>
+                            <GenderContainer>
+                                <GenderButton
+                                    selected={selectedGender === '남자'}
+                                    onPress={() => setSelectedGender('남자')}
+                                >
+                                    <GenderText selected={selectedGender === '남자'}>
+                                        남자
+                                    </GenderText>
+                                </GenderButton>
+                                <GenderButton
+                                    selected={selectedGender === '여자'}
+                                    onPress={() => setSelectedGender('여자')}
+                                >
+                                    <GenderText selected={selectedGender === '여자'}>
+                                        여자
+                                    </GenderText>
+                                </GenderButton>
+                            </GenderContainer>
+                        </StepContainer>
+
+                        <StepContainer>
+                            <StepHeader>
+                                <StepNumber>
+                                    <StepNumberText>3</StepNumberText>
+                                </StepNumber>
+                                <StepTitle><Bold>나이</Bold>를 알려주세요</StepTitle>
+                            </StepHeader>
+                            <Input
+                                placeholder="나이를 입력해주세요"
+                                value={age}
+                                onChangeText={setAge}
+                                keyboardType="numeric"
+                                returnKeyType="next"
+                            />
+                        </StepContainer>
+
+                        <StepContainer>
+                            <StepHeader>
+                                <StepNumber>
+                                    <StepNumberText>4</StepNumberText>
+                                </StepNumber>
+                                <StepTitle><Bold>전화번호</Bold>를 알려주세요</StepTitle>
+                            </StepHeader>
+                            <Input
+                                placeholder="전화번호를 입력해주세요"
+                                value={phone}
+                                onChangeText={setPhone}
+                                keyboardType="phone-pad"
+                                returnKeyType="done"
+                            />
+                        </StepContainer>
+
+                        <SubmitButton
+                            onPress={() => {
+                                console.log('회원가입 데이터:', { name, selectedGender, age, phone });
+                                navigation.navigate('OK');
+                            }}
+                        >
+                            <SubmitButtonText>다음</SubmitButtonText>
+                        </SubmitButton>
+                    </FormContainer>
+                </KeyboardAvoidingView>
             </Container>
         </SafeView>
     );

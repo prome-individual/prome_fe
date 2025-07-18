@@ -12,12 +12,10 @@ const LoginScreen = ({ navigation }) => {
             {/* password 입력 */}
 
             <Button title="메인 가기" onPress={() => {
-                Alert.alert('버튼 누름!');
                 navigation.navigate('Main'); }}
             />
             <Text>Sign in</Text>
             <Button title="회원가입창" onPress={() => {
-                Alert.alert('버튼 누름!');
                 navigation.navigate('Register'); }}
             />
             <Button title="채팅페이지" onPress={() => {

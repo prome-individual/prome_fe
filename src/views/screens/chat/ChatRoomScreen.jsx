@@ -1,14 +1,17 @@
-import React, { useState, useRef } from 'react';
-import { ScrollView, TextInput, KeyboardAvoidingView, Platform, TouchableOpacity, Image } from 'react-native';
+import React, { useState, useRef, useEffect } from 'react';
+import { ScrollView, TextInput, KeyboardAvoidingView, Platform, TouchableOpacity, Image, Keyboard } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import styled from 'styled-components/native';
 import Colors from '../../styles/Colors';
 import LinearGradient from 'react-native-linear-gradient';
 import { Svg, Line } from 'react-native-svg';
 import Back from '../../common/Back';
+import useFullScreen from '../../hooks/useFullScreen';
+import Fontsizes from '../../styles/fontsizes';
 
 const SafeView = styled(SafeAreaView)`
     flex: 1;
+    background-color: ${Colors.background.bg};
 `;
 
 const Container = styled.View`
@@ -16,13 +19,8 @@ const Container = styled.View`
     background-color: ${Colors.background.bg};
 `;
 
-const KeyboardView = styled(KeyboardAvoidingView)`
-    flex: 1;
-`;
-
-// 고정 헤더 영역
 const Top = styled.View`
-    height: 20%;
+    height: ${props => props.keyboardVisible ? '10%' : '20%'};
     justify-content: center;
     align-items: center;
     position: relative;
@@ -43,7 +41,7 @@ const Gradient = styled(LinearGradient).attrs({
 `;
 
 const TopText = styled.Text`
-    font-size: 24px;
+    font-size: ${Fontsizes.mm};
     font-weight: 600;
     text-align: center;
     margin-bottom: 24px;
@@ -74,13 +72,12 @@ const LineContainer = styled.View`
     justify-content: center;
 `;
 
-// 스크롤 가능한 채팅 영역
 const ChatScrollView = styled(ScrollView)`
     flex: 1;
     padding: 20px;
 `;
 
-// Kong 정보 (스크롤 영역 내부)
+// Kong 정보
 const Kong = styled.View`
     flex-direction: row;
     align-items: center;
@@ -142,7 +139,6 @@ const WelcomeMessage = styled.Text`
     margin: 20px 0;
 `;
 
-// 채팅 메시지
 const ChatMessage = styled.View`
     border: 2px solid ${Colors.primary};
     border-radius: 20px;
@@ -164,7 +160,6 @@ const ChatText = styled.Text`
     line-height: 22px;
 `;
 
-// 선택 버튼들
 const SelectWrapper = styled.View`
     flex-direction: row;
     flex-wrap: wrap;
@@ -184,20 +179,21 @@ const SelectText = styled.Text`
     color: #171717;
 `;
 
-// 하단 입력 영역 (고정)
 const InputSection = styled.View`
     background-color: ${Colors.background.bg};
     padding: 16px 20px;
+    padding-bottom: 20px;
     border-top-width: 1px;
     border-top-color: #f0f0f0;
     flex-direction: row;
     align-items: center;
     gap: 12px;
+    min-height: 80px;
 `;
 
 const IconButton = styled(TouchableOpacity)`
-    width: 48px;
-    height: 48px;
+    width: 40px;
+    height: 40px;
     border-radius: 24px;
     background-color: ${Colors.primary};
     justify-content: center;
@@ -226,25 +222,29 @@ const Input = styled(TextInput)`
     flex: 1;
     font-size: 16px;
     color: #333;
-`;
-
-const Send = styled(TouchableOpacity)`
-    width: 48px;
-    height: 48px;
-    background-color: ${Colors.primary};
-    border-radius: 24px;
-    justify-content: center;
-    align-items: center;
-`;
-
-const SendCheck = styled.Text`
-    font-size: 14px;
-    text-align: center;
-    color: white;
-    font-weight: 600;
+    max-height: 100px;
 `;
 
 const ChatRoomScreen = ({ navigation }) => {
+    const { enableFullScreen, disableFullScreen } = useFullScreen();
+    const [keyboardVisible, setKeyboardVisible] = useState(false);
+
+    useEffect(() => {
+        enableFullScreen();
+        const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
+            setKeyboardVisible(true);
+        });
+        const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
+            setKeyboardVisible(false);
+        });
+
+        return () => {
+            disableFullScreen();
+            keyboardDidShowListener.remove();
+            keyboardDidHideListener.remove();
+        };
+    }, [enableFullScreen, disableFullScreen]);
+
     const [messages, setMessages] = useState([
         { id: 1, text: '안녕하세요, 콩콩봇입니다', isUser: false },
         { id: 2, text: '문의하실 내용을 간단히 입력하시거나, 아래 버튼을 선택해주세요', isUser: false },
@@ -261,7 +261,9 @@ const ChatRoomScreen = ({ navigation }) => {
             };
             setMessages([...messages, newMessage]);
             setInputText('');
-            // 봇 응답 시뮬레이션 (실제로는 API 호출)
+            setTimeout(() => {
+                scrollViewRef.current?.scrollToEnd({ animated: true });
+            }, 100);
             setTimeout(() => {
                 const botResponse = {
                     id: messages.length + 2,
@@ -269,6 +271,9 @@ const ChatRoomScreen = ({ navigation }) => {
                     isUser: false,
                 };
                 setMessages(prev => [...prev, botResponse]);
+                setTimeout(() => {
+                    scrollViewRef.current?.scrollToEnd({ animated: true });
+                }, 100);
             }, 1000);
         }
     };
@@ -280,6 +285,11 @@ const ChatRoomScreen = ({ navigation }) => {
             isUser: true,
         };
         setMessages([...messages, newMessage]);
+        
+        setTimeout(() => {
+            scrollViewRef.current?.scrollToEnd({ animated: true });
+        }, 100);
+        
         setTimeout(() => {
             const botResponse = {
                 id: messages.length + 2,
@@ -287,56 +297,63 @@ const ChatRoomScreen = ({ navigation }) => {
                 isUser: false,
             };
             setMessages(prev => [...prev, botResponse]);
+            
+            setTimeout(() => {
+                scrollViewRef.current?.scrollToEnd({ animated: true });
+            }, 100);
         }, 1000);
     };
 
     return (
-        <SafeView>
+        <SafeView edges={[]}>
             <Container>
-                <Back navigation={navigation} />
-                <Top>
+                <Top keyboardVisible={keyboardVisible}>
+                    <Back navigation={navigation} />
                     <Gradient />
                     <TopText>콩콩봇</TopText>
-                    <Date>
-                        <LineContainer>
-                            <Svg width="100%" height="2">
-                                <Line
-                                    x1="0"
-                                    y1="1"
-                                    x2="100%"
-                                    y2="1"
-                                    stroke="#000000"
-                                    strokeWidth="1"
-                                    opacity="0.3"
-                                />
-                            </Svg>
-                        </LineContainer>
-                        <DateText>오늘</DateText>
-                        <LineContainer>
-                            <Svg width="100%" height="2">
-                                <Line
-                                    x1="0"
-                                    y1="1"
-                                    x2="100%"
-                                    y2="1"
-                                    stroke="#000000"
-                                    strokeWidth="1"
-                                    opacity="0.3"
-                                />
-                            </Svg>
-                        </LineContainer>
-                    </Date>
+                    {!keyboardVisible && (
+                        <Date>
+                            <LineContainer>
+                                <Svg width="100%" height="2">
+                                    <Line
+                                        x1="0"
+                                        y1="1"
+                                        x2="100%"
+                                        y2="1"
+                                        stroke="#000000"
+                                        strokeWidth="1"
+                                        opacity="0.3"
+                                    />
+                                </Svg>
+                            </LineContainer>
+                            <DateText>오늘</DateText>
+                            <LineContainer>
+                                <Svg width="100%" height="2">
+                                    <Line
+                                        x1="0"
+                                        y1="1"
+                                        x2="100%"
+                                        y2="1"
+                                        stroke="#000000"
+                                        strokeWidth="1"
+                                        opacity="0.3"
+                                    />
+                                </Svg>
+                            </LineContainer>
+                        </Date>
+                    )}
                 </Top>
 
-                <KeyboardView
+                <KeyboardAvoidingView
+                    style={{ flex: 1 }}
                     behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-                    keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
+                    keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
                 >
                     <ChatScrollView
                         showsVerticalScrollIndicator={false}
                         keyboardShouldPersistTaps="handled"
                         ref={scrollViewRef}
-                        onContentSizeChange={() => scrollViewRef.current?.scrollToEnd({ animated: true })}
+                        contentContainerStyle={{ paddingBottom: 20 }}
                     >
                         <Kong>
                             <SmallKongIcon>
@@ -360,7 +377,7 @@ const ChatRoomScreen = ({ navigation }) => {
                             </ChatMessage>
                         ))}
 
-                        {messages.length <= 2 && (
+                        {messages.length <= 2 && !keyboardVisible && (
                             <>
                                 <SelectWrapper>
                                     <Select onPress={() => handleQuickSelect('심전도 검사')}>
@@ -397,17 +414,16 @@ const ChatRoomScreen = ({ navigation }) => {
                         <InputWrapper>
                             <Input
                                 placeholder="메시지를 입력해주세요"
-                                multiline={false}
+                                multiline={true}
                                 value={inputText}
                                 onChangeText={setInputText}
                                 onSubmitEditing={sendMessage}
+                                blurOnSubmit={true}
+                                returnKeyType="send"
                             />
                         </InputWrapper>
-                        <Send onPress={sendMessage}>
-                            <SendCheck>전송</SendCheck>
-                        </Send>
                     </InputSection>
-                </KeyboardView>
+                </KeyboardAvoidingView>
             </Container>
         </SafeView>
     );

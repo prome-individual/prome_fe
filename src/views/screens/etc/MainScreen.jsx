@@ -3,7 +3,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { TouchableOpacity, Image } from 'react-native';
 import styled from 'styled-components/native';
 import Back from '../../common/Back';
-
+import Colors from '../../styles/Colors';
 
 const SafeView = styled(SafeAreaView)`
     flex: 1;
@@ -20,13 +20,7 @@ const Top = styled.View`
     width: 100%;
     justify-content: center;
     align-self: center;
-    height: 20%;
-`;
-
-const TopImg = styled(Image)`
-    width: 100%;
-    height: 100%;
-    resize-mode: cover;
+    background-color: ${Colors.primary};
 `;
 
 const TopText = styled.Text`
@@ -34,7 +28,6 @@ const TopText = styled.Text`
     color: white;
     font-size: 16px;
     z-index: 1;
-    top: 0;
 `;
 
 const Img = styled(Image)`
@@ -77,11 +70,9 @@ const MainScreen = ({ navigation }) => {
             <Container>
                 <Top>
                     <Back navigation={navigation} />
-                    <TopText>심전도 검사를 통해 건강을 체크하세요!</TopText>
-                    <TopImg source={require('../../../assets/medical.png')} />
+                    <TopText style={{  top: 10, left: 10 }}>이런 심전도 검사는 어때요?</TopText>
+                    <TopText style={{  top: 110, right: 10 }}>심전도 검사 하러가기 !!</TopText>
                 </Top>
-                <ExpText>심전도 검사를 실행해보세요!</ExpText>
-                <Img source={require('../../../assets/medical.png')} />
                 <ExpText>AI 챗봇에게 질문해보세요!</ExpText>
                 <QuestionWrapper>
                     <Question>
