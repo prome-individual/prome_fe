@@ -1,21 +1,224 @@
-import React from 'react';
-import { Alert, Text, Image, Button, ScrollView } from 'react-native';
+import React, { useState, useRef, useEffect } from 'react';
+import { ScrollView, KeyboardAvoidingView, Platform, TouchableOpacity, Image, Keyboard } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import styled from 'styled-components/native';
+import Colors from '../../styles/Colors';
+import LinearGradient from 'react-native-linear-gradient';
+import Back from '../../common/Back';
+import useFullScreen from '../../hooks/useFullScreen';
+import Fontsizes from '../../styles/fontsizes';
 
-const DiagScreen = () => {
+const SafeView = styled(SafeAreaView)`
+    flex: 1;
+    background-color: ${Colors.background.bg};
+`;
+
+const Container = styled.View`
+    flex: 1;
+    background-color: ${Colors.background.bg};
+`;
+
+const Top = styled.View`
+    height: ${props => props.keyboardVisible ? '10%' : '20%'};
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    background-color: ${Colors.background.bg};
+    margin-bottom: -25px;
+`;
+
+const Gradient = styled(LinearGradient).attrs({
+    colors: Colors.background.gradientReverse,
+    start: {x: 0, y: 0},
+    end: {x: 0, y: 1},
+    opacity: 0.14,
+})`
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+`;
+
+const TopText = styled.Text`
+    font-size: ${Fontsizes.mm};
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 24px;
+`;
+
+const ChatScrollView = styled(ScrollView)`
+    flex: 1;
+    padding: 20px;
+    padding-bottom: 100px;
+`;
+
+const KongContainer = styled.View`
+    align-items: center;
+    justify-content: center;
+    margin: 5px 0 15px 0;
+`;
+
+const LargeKongIcon = styled.View`
+    width: 80px;
+    height: 80px;
+    border-radius: 40px;
+    background-color: #DEF3FB;
+    border: 3px solid ${Colors.primary};
+    justify-content: center;
+    align-items: center;
+`;
+
+const LargeKongImage = styled(Image)`
+    width: 60px;
+    height: 60px;
+    resize-mode: contain;
+`;
+
+const WelcomeMessage = styled.Text`
+    font-size: 18px;
+    font-weight: 600;
+    text-align: center;
+    color: #333;
+    margin: 20px 0;
+`;
+
+const ChatMessage = styled.View`
+    border: 2px solid ${Colors.primary};
+    border-radius: 20px;
+    background-color: white;
+    padding: 12px 16px;
+    margin: 8px 0;
+    shadow-color: #000;
+    shadow-offset: 0px 2px;
+    shadow-opacity: 0.1;
+    shadow-radius: 4px;
+    elevation: 3;
+    align-self: ${props => props.isUser ? 'flex-end' : 'flex-start'};
+    width: 95%;
+    align-self: center;
+`;
+
+const ChatText = styled.Text`
+    font-size: 12px;
+    color: #333;
+    line-height: 20px;
+`;
+
+const Bold = styled.Text`
+    font-weight: 600;
+`;
+
+const BottomSection = styled.View`
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: ${Colors.background.bg};
+    padding: 20px;
+`;
+
+const DiagButton = styled(TouchableOpacity)`
+    background-color: #FF5757;
+    border-radius: 8px;
+    padding: 16px;
+    align-items: center;
+    justify-content: center;
+`;
+
+const DiagButtonText = styled.Text`
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+`;
+
+const DiagScreen = ({ navigation }) => {
+    const { enableFullScreen, disableFullScreen } = useFullScreen();
+    const [keyboardVisible, setKeyboardVisible] = useState(false);
+
+    useEffect(() => {
+        enableFullScreen();
+        const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
+            setKeyboardVisible(true);
+        });
+        const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
+            setKeyboardVisible(false);
+        });
+
+        return () => {
+            disableFullScreen();
+            keyboardDidShowListener.remove();
+            keyboardDidHideListener.remove();
+        };
+    }, [enableFullScreen, disableFullScreen]);
+
+    const [messages, setMessages] = useState([]);
+
+    const [frequentQuestions] = useState([
+        '양쪽 팔꿈치 안쪽에 전극패치를 부착해주세요',
+        '오른쪽 복숭아 뼈 안쪽 아래에 부착해주세요',
+        '양 팔을 다리 위에 올린 뒤 편하게 기다려 주세요',
+        '측정 시작하기를 눌러주세요',
+        '검사가 완료되면 결과를 확인해 주세요',
+    ]);
+
+    const scrollViewRef = useRef(null);
+
+    const handleDiagButtonPress = () => {
+        navigation.navigate('Main');
+    };
+
     return (
-        <SafeAreaView>
-            <Text>심전도 검사를 진행하고 건강을 체크해보세요!</Text>
-            <Image />
-            <ScrollView>
-                <Text>Step 1</Text>
-                <Text>Step 2</Text>
-                <Text>Step 3</Text>
-                <Text>Step 4</Text>
-            </ScrollView>
+        <SafeView edges={[]}>
+            <Container>
+                <Top keyboardVisible={keyboardVisible}>
+                    <Back navigation={navigation} />
+                    <Gradient />
+                    <TopText>콩콩봇</TopText>
+                </Top>
 
-            <Button title="검사 결과로 ai 챗봇에게 물어보기" onPress={() => { Alert.alert('버튼 누름!'); }}/>
-        </SafeAreaView>
+                <KeyboardAvoidingView
+                    style={{ flex: 1 }}
+                    behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                    keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
+                >
+                    <ChatScrollView
+                        showsVerticalScrollIndicator={false}
+                        keyboardShouldPersistTaps="handled"
+                        ref={scrollViewRef}
+                        contentContainerStyle={{ paddingBottom: 20 }}
+                    >
+                        <KongContainer>
+                            <LargeKongIcon>
+                                <LargeKongImage source={require('../../../assets/kong.png')} />
+                            </LargeKongIcon>
+                        </KongContainer>
+
+                        <WelcomeMessage>심전도 검사를 도와드릴게요 !</WelcomeMessage>
+
+                        {messages.map((message) => (
+                            <ChatMessage key={message.id} isUser={message.isUser}>
+                                <ChatText>{message.text}</ChatText>
+                            </ChatMessage>
+                        ))}
+
+                        {messages.length === 0 && frequentQuestions.map((question, index) => (
+                            <ChatMessage key={index} isUser={false}>
+                                <ChatText>
+                                    <Bold>Step {index + 1}.</Bold> {question}
+                                </ChatText>
+                            </ChatMessage>
+                        ))}
+                    </ChatScrollView>
+
+                    <BottomSection>
+                        <DiagButton onPress={handleDiagButtonPress}>
+                            <DiagButtonText>검사결과 입력하기</DiagButtonText>
+                        </DiagButton>
+                    </BottomSection>
+                </KeyboardAvoidingView>
+            </Container>
+        </SafeView>
     );
 };
 

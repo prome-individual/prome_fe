@@ -62,7 +62,7 @@ const TabBar = ({ navigation, currentScreen = 'Home' }) => {
             name: 'Profile',
             label: '',
             icon: require('../../assets/profile.png'),
-            screen: 'Profile',
+            screen: 'Main',
         },
         {
             name: 'Home',
@@ -74,7 +74,7 @@ const TabBar = ({ navigation, currentScreen = 'Home' }) => {
             name: 'Menu',
             label: '',
             icon: require('../../assets/box.png'),
-            screen: 'Menu',
+            screen: 'Main',
         },
     ];
 

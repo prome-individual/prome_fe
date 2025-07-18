@@ -108,6 +108,7 @@ const KongText = styled.Text`
     margin-right: 10px;
 `;
 
+// 환영 메시지 영역
 const KongContainer = styled.View`
     align-items: center;
     justify-content: center;
@@ -138,7 +139,7 @@ const WelcomeMessage = styled.Text`
     margin: 20px 0;
 `;
 
-const ChatMessage = styled.View`
+const ChatMessage = styled(TouchableOpacity)`
     border: 2px solid ${Colors.primary};
     border-radius: 20px;
     background-color: white;
@@ -159,72 +160,7 @@ const ChatText = styled.Text`
     line-height: 22px;
 `;
 
-const SelectWrapper = styled.View`
-    flex-direction: row;
-    flex-wrap: wrap;
-    padding: 5px 0;
-    gap: 8px;
-`;
-
-const Select = styled(TouchableOpacity)`
-    background-color: #F4F4F4;
-    border-radius: 30px;
-    border: 1px solid #D4AAAA;
-    padding: 10px 16px;
-`;
-
-const SelectText = styled.Text`
-    font-size: 14px;
-    color: #171717;
-`;
-
-const InputSection = styled.View`
-    background-color: ${Colors.background.bg};
-    padding: 16px 20px;
-    padding-bottom: 20px;
-    border-top-width: 1px;
-    border-top-color: #f0f0f0;
-    flex-direction: row;
-    align-items: center;
-    gap: 12px;
-    min-height: 80px;
-`;
-
-const IconButton = styled(TouchableOpacity)`
-    width: 40px;
-    height: 40px;
-    border-radius: 24px;
-    background-color: ${Colors.primary};
-    justify-content: center;
-    align-items: center;
-`;
-
-const IconImage = styled(Image)`
-    width: 24px;
-    height: 24px;
-    resize-mode: contain;
-    tint-color: white;
-`;
-
-const InputWrapper = styled.View`
-    flex: 1;
-    background-color: white;
-    border-radius: 25px;
-    border: 1px solid #ddd;
-    padding: 4px 20px;
-    flex-direction: row;
-    align-items: center;
-    min-height: 48px;
-`;
-
-const Input = styled(TextInput)`
-    flex: 1;
-    font-size: 16px;
-    color: #333;
-    max-height: 100px;
-`;
-
-const ChatRoomScreen = ({ navigation }) => {
+const ChatMostScreen = ({ navigation }) => {
     const { enableFullScreen, disableFullScreen } = useFullScreen();
     const [keyboardVisible, setKeyboardVisible] = useState(false);
 
@@ -244,59 +180,51 @@ const ChatRoomScreen = ({ navigation }) => {
         };
     }, [enableFullScreen, disableFullScreen]);
 
-    const [messages, setMessages] = useState([
-        { id: 1, text: '안녕하세요, 콩콩봇입니다', isUser: false },
-        { id: 2, text: '문의하실 내용을 간단히 입력하시거나, 아래 버튼을 선택해주세요', isUser: false },
+    const [messages, setMessages] = useState([]);
+
+    const [frequentQuestions] = useState([
+        { id: 1, text: '심전도는 어떤 검사에요?', isUser: false },
+        { id: 2, text: '저는 지금 병원에 당장 가야 할까요?', isUser: false },
+        { id: 3, text: '심전도 검사는 언제 받아야해요?', isUser: false },
+        { id: 4, text: '저는 왜 콩콩봇이 아닐까요?', isUser: false },
     ]);
-    const [inputText, setInputText] = useState('');
+
     const scrollViewRef = useRef(null);
 
-    const sendMessage = () => {
-        if (inputText.trim()) {
-            const newMessage = {
-                id: messages.length + 1,
-                text: inputText,
-                isUser: true,
-            };
-            setMessages([...messages, newMessage]);
-            setInputText('');
-            setTimeout(() => {
-                scrollViewRef.current?.scrollToEnd({ animated: true });
-            }, 100);
-            setTimeout(() => {
-                const botResponse = {
-                    id: messages.length + 2,
-                    text: '메시지를 받았습니다. 어떻게 도와드릴까요?',
-                    isUser: false,
-                };
-                setMessages(prev => [...prev, botResponse]);
-                setTimeout(() => {
-                    scrollViewRef.current?.scrollToEnd({ animated: true });
-                }, 100);
-            }, 1000);
-        }
+    const questionAnswers = {
+        '심전도는 어떤 검사에요?': '심전도(ECG)는 심장의 전기적 활동을 측정하는 검사입니다. 심장 박동의 리듬과 강도를 확인하여 부정맥, 심근경색 등을 진단할 수 있습니다.',
+        '저는 지금 병원에 당장 가야 할까요?': '심전도 검사 결과나 증상에 따라 다릅니다. 가슴 통증, 호흡곤란, 어지러움 등의 증상이 있다면 즉시 병원에 방문하시는 것이 좋습니다.',
+        '심전도 검사는 언제 받아야해요?': '정기 건강검진 시 또는 가슴 통증, 두근거림, 호흡곤란 등의 증상이 있을 때 받으시면 됩니다. 나이가 많거나 심장질환 위험인자가 있다면 정기적으로 받는 것이 좋습니다.',
+        '저는 왜 콩콩봇이 아닐까요?': '저는 심전도 검사와 심장 건강에 대해 도움을 드리는 콩콩봇입니다. 궁금한 점이 있으시면 언제든지 질문해주세요!',
     };
 
-    const handleQuickSelect = (text) => {
-        const newMessage = {
-            id: messages.length + 1,
-            text: text,
+    const [messageId, setMessageId] = useState(1);
+
+    const handleQuestionPress = (questionText) => {
+        const userMessage = {
+            id: messageId,
+            text: questionText,
             isUser: true,
         };
-        setMessages([...messages, newMessage]);
+        setMessages(prev => [...prev, userMessage]);
+        setMessageId(prev => prev + 1);
         setTimeout(() => {
             scrollViewRef.current?.scrollToEnd({ animated: true });
         }, 100);
         setTimeout(() => {
             const botResponse = {
-                id: messages.length + 2,
-                text: `${text}에 대해 도움을 드리겠습니다.`,
+                id: messageId + 1,
+                text: questionAnswers[questionText] || '해당 질문에 대한 답변을 준비 중입니다.',
                 isUser: false,
             };
             setMessages(prev => [...prev, botResponse]);
+            setMessageId(prev => prev + 1);
             setTimeout(() => {
                 scrollViewRef.current?.scrollToEnd({ animated: true });
             }, 100);
+            setTimeout(() => {
+                setMessages([]);
+            }, 4000);
         }, 1000);
     };
 
@@ -365,7 +293,7 @@ const ChatRoomScreen = ({ navigation }) => {
                             </LargeKongIcon>
                         </KongContainer>
 
-                        <WelcomeMessage>김미소님, 무엇을 도와드릴까요?</WelcomeMessage>
+                        <WelcomeMessage>가장 많이 한 질문들을 보여드릴게요 !</WelcomeMessage>
 
                         {messages.map((message) => (
                             <ChatMessage key={message.id} isUser={message.isUser}>
@@ -373,56 +301,20 @@ const ChatRoomScreen = ({ navigation }) => {
                             </ChatMessage>
                         ))}
 
-                        {messages.length <= 2 && !keyboardVisible && (
-                            <>
-                                <SelectWrapper>
-                                    <Select onPress={() => handleQuickSelect('심전도 검사')}>
-                                        <SelectText>심전도 검사</SelectText>
-                                    </Select>
-                                    <Select onPress={() => handleQuickSelect('질의 응답')}>
-                                        <SelectText>질의 응답</SelectText>
-                                    </Select>
-                                </SelectWrapper>
-                                <SelectWrapper>
-                                    <Select onPress={() => handleQuickSelect('심전도 검사 관련 질문')}>
-                                        <SelectText>심전도 검사 관련 질문</SelectText>
-                                    </Select>
-                                    <Select onPress={() => handleQuickSelect('기록 보기')}>
-                                        <SelectText>기록 보기</SelectText>
-                                    </Select>
-                                </SelectWrapper>
-                                <SelectWrapper>
-                                    <Select onPress={() => handleQuickSelect('기타 서비스 문의')}>
-                                        <SelectText>기타 서비스 문의</SelectText>
-                                    </Select>
-                                </SelectWrapper>
-                            </>
-                        )}
+                        {messages.length === 0 && frequentQuestions.map((question) => (
+                            <ChatMessage
+                                key={question.id}
+                                isUser={question.isUser}
+                                onPress={() => handleQuestionPress(question.text)}
+                            >
+                                <ChatText>{question.text}</ChatText>
+                            </ChatMessage>
+                        ))}
                     </ChatScrollView>
-
-                    <InputSection>
-                        <IconButton>
-                            <IconImage source={require('../../../assets/home.png')} />
-                        </IconButton>
-                        <IconButton>
-                            <IconImage source={require('../../../assets/box.png')} />
-                        </IconButton>
-                        <InputWrapper>
-                            <Input
-                                placeholder="메시지를 입력해주세요"
-                                multiline={true}
-                                value={inputText}
-                                onChangeText={setInputText}
-                                onSubmitEditing={sendMessage}
-                                blurOnSubmit={true}
-                                returnKeyType="send"
-                            />
-                        </InputWrapper>
-                    </InputSection>
                 </KeyboardAvoidingView>
             </Container>
         </SafeView>
     );
 };
 
-export default ChatRoomScreen;
+export default ChatMostScreen;

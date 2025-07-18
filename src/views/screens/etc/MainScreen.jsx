@@ -189,17 +189,17 @@ const MainScreen = ({ navigation }) => {
                 </Top>
                 <ExpText>AI 챗봇에게 질문해보세요!</ExpText>
                 <QuestionWrapper>
-                    <QuestionLeft>
+                    <QuestionLeft onPress={() => navigation.navigate('Chat')}>
                         <QuestionTextWrapper>
                             <QuestionLeftText>즉시 답해드려요</QuestionLeftText>
                             <QuestionLeftTextSmile source={require('../../../assets/smile.png')} alt="스마일" />
                         </QuestionTextWrapper>
                         <KongDot source={require('../../../assets/kong_dot.png')} alt="점선콩" />
                         <KongVector source={require('../../../assets/vector_left.png')} alt="콩벡터" />
-                        <Red style={{ position: 'absolute', bottom: 4, left: 20, fontSize: 12}}>with 콩콩봇</Red>
+                        <Red style={{ position: 'absolute', bottom: 4, left: 20, fontSize: 12 }}>with 콩콩봇</Red>
                     </QuestionLeft>
                     <QuestionRightWrapper>
-                        <QuestionRight1>
+                        <QuestionRight1 onPress={() => navigation.navigate('ChatMost') }>
                             <QuestionIcon source={require('../../../assets/question.png')} alt="물음표"/>
                             <QuestionIcon style={{ bottom: 10, left: 18 }} source={require('../../../assets/eclip.png')} alt="그림자"/>
                             <QuestionIcon style={{ width: 24, height: 24, left: 40, transform: [{ rotate: '45deg' }] }} source={require('../../../assets/question.png')} alt="물음표"/>

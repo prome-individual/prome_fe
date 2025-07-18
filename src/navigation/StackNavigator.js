@@ -7,6 +7,7 @@ import OKScreen from '../views/screens/auth/OKScreen';
 
 import ChatRoomScreen from '../views/screens/chat/ChatRoomScreen';
 import ChatPeriodSelectScreen from '../views/screens/chat/ChatPeriodSelectScreen';
+import ChatMostScreen from '../views/screens/chat/ChatMostScreen';
 
 import DiagScreen from '../views/screens/diag/DiagScreen';
 
@@ -39,6 +40,10 @@ const StackNavigator = () => {
             />
             <Stack.Screen name="ChatPeriod"
                 component={ChatPeriodSelectScreen}
+                options={{ headerShown: false, animation: 'none'}}
+            />
+            <Stack.Screen name="ChatMost"
+                component={ChatMostScreen}
                 options={{ headerShown: false, animation: 'none'}}
             />
             <Stack.Screen name="Diag"

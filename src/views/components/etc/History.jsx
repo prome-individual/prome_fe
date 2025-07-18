@@ -45,22 +45,27 @@ const FindHistoryRight = styled(TouchableOpacity)`
     margin-top: 3px;
     margin-left: 3px;
     margin-right: 3px;
-    justify-content: center;
+    justify-content: space-between;
+    flex-direction: row;
+    padding: 10px;
+`;
+
+const FindHistoryRightVector = styled(Image)`
+    align-self: center;
 `;
 
 const FindHistoryRightText = styled.Text`
     font-size: 12px;
     color: #171717;
     text-align: right;
-    margin-right: 10px;
-
+    align-self: center;
 `;
 
 function History({ navigation }) {
     return (
         <HistoryWrapper>
             <FindHistory>
-                <FindHistoryLeft>
+                <FindHistoryLeft onPress={() => navigation.navigate('Diag')}>
                     <FindHistoryLeftText style={{ fontSize: 18, paddingTop: 15, paddingLeft: 10, fontWeight: 600 }}>방금 한 검사 !</FindHistoryLeftText>
                     <FindHistoryImagWrapper>
                         <FindHistoryLeftImg source={require('../../../assets/diag.png')} alt="검사 확인" />
@@ -70,12 +75,15 @@ function History({ navigation }) {
             </FindHistory>
             <FindHistory>
                 <FindHistoryRight>
+                    <FindHistoryRightVector source={require('../../../assets/history_vector.png')} alt="기록벡터" />
                     <FindHistoryRightText>7일 이내</FindHistoryRightText>
                 </FindHistoryRight>
                 <FindHistoryRight>
+                    <FindHistoryRightVector source={require('../../../assets/history_vector.png')} alt="기록벡터" />
                     <FindHistoryRightText>한달 이내</FindHistoryRightText>
                 </FindHistoryRight>
                 <FindHistoryRight>
+                    <FindHistoryRightVector source={require('../../../assets/history_vector.png')} alt="기록벡터" />
                     <FindHistoryRightText>3개월 이내</FindHistoryRightText>
                 </FindHistoryRight>
             </FindHistory>
