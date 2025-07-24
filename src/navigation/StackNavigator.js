@@ -14,6 +14,7 @@ import DiagScreen from '../views/screens/diag/DiagScreen';
 
 import DescriptionScreen from '../views/screens/etc/DescriptionScreen';
 import MainScreen from '../views/screens/etc/MainScreen';
+import MapScreen from '../views/screens/etc/MapScreen';
 
 import CalendarScreen from '../views/screens/calendar/CalendarScreen';
 import CallScreen from '../views/screens/hospital/CallScreen';
@@ -61,6 +62,10 @@ const StackNavigator = () => {
             />
             <Stack.Screen name="Main"
                 component={MainScreen}
+                options={{ headerShown: false, animation: 'none'}}
+            />
+            <Stack.Screen name="Map"
+                component={MapScreen}
                 options={{ headerShown: false, animation: 'none'}}
             />
             <Stack.Screen name="Calendar"

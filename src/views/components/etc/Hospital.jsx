@@ -25,12 +25,16 @@ const FindHospitalText = styled.Text`
 `;
 
 function Hospital({ navigation }) {
+    const handleHospitalSearch = (hospitalType) => {
+        navigation.navigate('Map', { hospitalType });
+    };
+
     return (
         <FindHospitalWrapper>
-            <FindHospital>
+            <FindHospital onPress={() => handleHospitalSearch('모든 병원')}>
                 <FindHospitalText>모든 병원 찾기</FindHospitalText>
             </FindHospital>
-            <FindHospital>
+            <FindHospital onPress={() => handleHospitalSearch('심전도 병원')}>
                 <FindHospitalText>심전도 병원 찾기</FindHospitalText>
             </FindHospital>
         </FindHospitalWrapper>

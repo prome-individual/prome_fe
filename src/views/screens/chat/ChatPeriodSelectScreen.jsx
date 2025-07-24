@@ -193,7 +193,7 @@ const SearchContainer = styled.View`
     flex-direction: row;
     align-items: center;
     background-color: #f9f9f9;
-    border: 1px solid #e0e0e0;
+    border: 1px solid ${Colors.primary};
     border-radius: 25px;
     padding: 0px 16px;
     margin-bottom: 5px;
@@ -203,7 +203,7 @@ const SearchIcon = styled.View`
     width: 20px;
     height: 20px;
     border-radius: 50%;
-    border: 2px solid #999;
+    border: 2px solid ${Colors.primary};
     margin-right: 10px;
     position: relative;
 `;
@@ -212,7 +212,7 @@ const SearchIconHandle = styled.View`
     position: absolute;
     width: 6px;
     height: 2px;
-    background-color: #999;
+    background-color: ${Colors.primary};
     bottom: -4px;
     right: -2px;
     transform: rotate(45deg);
@@ -315,8 +315,6 @@ const TabButton = styled(TouchableOpacity)`
 `;
 
 const TabIcon = styled(Image)`
-    width: 24px;
-    height: 24px;
     resize-mode: contain;
     tint-color: ${props => props.active ? 'white' : (Colors.primary || '#4CAF50')};
 `;
@@ -473,7 +471,7 @@ const ChatPeriodSelectScreen = ({ navigation, route }) => {
                                 <SearchIconHandle />
                             </SearchIcon>
                             <SearchInput
-                                placeholder="채팅 제목 검색"
+                                placeholder="검색"
                                 value={searchText}
                                 onChangeText={setSearchText}
                                 placeholderTextColor="#999"
