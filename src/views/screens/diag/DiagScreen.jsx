@@ -1,11 +1,13 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { ScrollView, KeyboardAvoidingView, Platform, TouchableOpacity, Image, Keyboard } from 'react-native';
+import { ScrollView, KeyboardAvoidingView, Platform, TouchableOpacity, Image, Keyboard, Modal } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import styled from 'styled-components/native';
 import Colors from '../../styles/Colors';
 import LinearGradient from 'react-native-linear-gradient';
 import Back from '../../common/Back';
 import useFullScreen from '../../hooks/useFullScreen';
+import useModal from '../../hooks/useModal';
+import DiagResultScreen from './DiagResultScreen';
 import Fontsizes from '../../styles/fontsizes';
 
 const SafeView = styled(SafeAreaView)`
@@ -111,11 +113,10 @@ const Bold = styled.Text`
 
 const BottomSection = styled.View`
     position: absolute;
-    bottom: 0;
+    bottom: -20;
     left: 0;
     right: 0;
-    background-color: ${Colors.background.bg};
-    padding: 20px;
+    padding: 30px;
 `;
 
 const DiagButton = styled(TouchableOpacity)`
@@ -132,8 +133,53 @@ const DiagButtonText = styled.Text`
     font-weight: 600;
 `;
 
+// 모달 관련 스타일
+const ModalOverlay = styled.View`
+    flex: 1;
+    background-color: rgba(31, 31, 31, 0.3);
+    justify-content: center;
+    align-items: center;
+`;
+
+const ModalContainer = styled.View`
+    width: 90%;
+    height: 80%;
+    background-color: ${Colors.background.bg};
+    border-radius: 15px;
+    overflow: hidden;
+`;
+
+const ModalHeader = styled.View`
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    border-bottom-width: 1px;
+    border-bottom-color: #eee;
+`;
+
+const ModalTitle = styled.Text`
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+`;
+
+const CloseButton = styled(TouchableOpacity)`
+    padding: 5px;
+`;
+
+const CloseButtonText = styled.Text`
+    font-size: 16px;
+    color: #666;
+`;
+
+const ModalContent = styled.View`
+    flex: 1;
+`;
+
 const DiagScreen = ({ navigation }) => {
     const { enableFullScreen, disableFullScreen } = useFullScreen();
+    const { isModalVisible, openModal, closeModal } = useModal();
     const [keyboardVisible, setKeyboardVisible] = useState(false);
 
     useEffect(() => {
@@ -165,7 +211,7 @@ const DiagScreen = ({ navigation }) => {
     const scrollViewRef = useRef(null);
 
     const handleDiagButtonPress = () => {
-        navigation.navigate('Main');
+        openModal();
     };
 
     return (
@@ -217,6 +263,28 @@ const DiagScreen = ({ navigation }) => {
                         </DiagButton>
                     </BottomSection>
                 </KeyboardAvoidingView>
+
+                {/* 모달 */}
+                <Modal
+                    visible={isModalVisible}
+                    transparent={true}
+                    animationType="fade"
+                    onRequestClose={closeModal}
+                >
+                    <ModalOverlay>
+                        <ModalContainer>
+                            <ModalHeader>
+                                <ModalTitle>검사결과 입력</ModalTitle>
+                                <CloseButton onPress={closeModal}>
+                                    <CloseButtonText>✕</CloseButtonText>
+                                </CloseButton>
+                            </ModalHeader>
+                            <ModalContent>
+                                <DiagResultScreen navigation={navigation} closeModal={closeModal} />
+                            </ModalContent>
+                        </ModalContainer>
+                    </ModalOverlay>
+                </Modal>
             </Container>
         </SafeView>
     );

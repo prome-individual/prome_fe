@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { TouchableOpacity, Image } from 'react-native';
+import { TouchableOpacity, Image, Alert } from 'react-native';
 import styled from 'styled-components/native';
 import Back from '../../common/Back';
 import Colors from '../../styles/Colors';
@@ -18,7 +18,7 @@ const Container = styled.View`
     width: 100%;
 `;
 
-const Top = styled.View`
+const Top = styled(TouchableOpacity)`
     width: 100%;
     height: 16%;
     justify-content: center;
@@ -179,11 +179,34 @@ const SelectText = styled.Text`
 const MainScreen = ({ navigation }) => {
     const [selectedTab, setSelectedTab] = useState('병원찾기');
 
+    const handleDiag = () => {
+        Alert.alert(
+            '심전도 진단',
+            '심전도 검사를 받으러 갈까요?',
+            [
+                {
+                    text: '아니오',
+                    style: 'cancel',
+                },
+                {
+                    text: '네',
+                    style: 'destructive',
+                    onPress: async () => {
+                        try {
+                            navigation.navigate('Diag');
+                        } catch (error) {
+                            console.error('로그아웃 실패:', error);
+                        }
+                    },
+                },
+            ]
+        );
+    };
+
     return (
         <SafeView>
             <Container>
-                <Top>
-                    <Back navigation={navigation} />
+                <Top onPress={() => handleDiag()}>
                     <TopText style={{  top: 10, left: 10 }}>이런 심전도 검사는 어때요?</TopText>
                     <TopText style={{  top: 80, right: 10 }}>심전도 검사 하러가기 !!</TopText>
                 </Top>

@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { ScrollView, TextInput, KeyboardAvoidingView, Platform, TouchableOpacity, Image, Keyboard } from 'react-native';
+import { ScrollView, TextInput, KeyboardAvoidingView, Platform, TouchableOpacity, Image, Keyboard, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import styled from 'styled-components/native';
 import Colors from '../../styles/Colors';
@@ -8,6 +8,7 @@ import { Svg, Line } from 'react-native-svg';
 import Back from '../../common/Back';
 import useFullScreen from '../../hooks/useFullScreen';
 import Fontsizes from '../../styles/fontsizes';
+import { ask } from '../../../models/chat';
 
 const SafeView = styled(SafeAreaView)`
     flex: 1;
@@ -77,7 +78,6 @@ const ChatScrollView = styled(ScrollView)`
     padding: 20px;
 `;
 
-// Kong 정보
 const Kong = styled.View`
     flex-direction: row;
     align-items: center;
@@ -224,9 +224,40 @@ const Input = styled(TextInput)`
     max-height: 100px;
 `;
 
+const ActionMessage = styled.View`
+    border: 2px solid ${Colors.primary};
+    border-radius: 20px;
+    background-color: white;
+    padding: 16px;
+    margin: 10px 0;
+    shadow-color: #000;
+    shadow-offset: 0px 2px;
+    shadow-opacity: 0.1;
+    shadow-radius: 4px;
+    elevation: 3;
+    align-self: flex-start;
+    max-width: 80%;
+`;
+
+const ActionButton = styled(TouchableOpacity)`
+    background-color: ${Colors.primary};
+    border-radius: 8px;
+    padding: 12px 20px;
+    margin-top: 10px;
+    align-items: center;
+`;
+
+const ActionButtonText = styled.Text`
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+`;
+
 const ChatRoomScreen = ({ navigation }) => {
     const { enableFullScreen, disableFullScreen } = useFullScreen();
     const [keyboardVisible, setKeyboardVisible] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+    const [currentChatId, setCurrentChatId] = useState(null);
 
     useEffect(() => {
         enableFullScreen();
@@ -251,53 +282,159 @@ const ChatRoomScreen = ({ navigation }) => {
     const [inputText, setInputText] = useState('');
     const scrollViewRef = useRef(null);
 
-    const sendMessage = () => {
-        if (inputText.trim()) {
+    const sendMessage = async () => {
+        if (inputText.trim() && !isLoading) {
+            setIsLoading(true);
             const newMessage = {
                 id: messages.length + 1,
                 text: inputText,
                 isUser: true,
             };
-            setMessages([...messages, newMessage]);
+
+            setMessages(prev => [...prev, newMessage]);
+            const currentInput = inputText;
             setInputText('');
+
             setTimeout(() => {
                 scrollViewRef.current?.scrollToEnd({ animated: true });
             }, 100);
-            setTimeout(() => {
-                const botResponse = {
+
+            try {
+                const response = await ask(currentInput, currentChatId);
+
+                if (response.success && response.chat) {
+                    if (!currentChatId && response.chat.chat_id) {
+                        setCurrentChatId(response.chat.chat_id);
+                    }
+
+                    const botResponse = {
+                        id: messages.length + 2,
+                        text: response.chat.answer.content,
+                        isUser: false,
+                        isRecommend: response.chat.answer.is_recommend,
+                        isDiag: response.chat.answer.is_diag,
+                    };
+
+                    setMessages(prev => [...prev, botResponse]);
+
+                    setTimeout(() => {
+                        scrollViewRef.current?.scrollToEnd({ animated: true });
+                    }, 100);
+                } else {
+                    throw new Error('AI 응답을 받을 수 없습니다.');
+                }
+            } catch (error) {
+                console.error('메시지 전송 에러:', error);
+
+                const errorResponse = {
                     id: messages.length + 2,
-                    text: '메시지를 받았습니다. 어떻게 도와드릴까요?',
+                    text: '죄송합니다. 일시적인 오류가 발생했습니다. 다시 시도해주세요.',
                     isUser: false,
                 };
-                setMessages(prev => [...prev, botResponse]);
+
+                setMessages(prev => [...prev, errorResponse]);
+
                 setTimeout(() => {
                     scrollViewRef.current?.scrollToEnd({ animated: true });
                 }, 100);
-            }, 1000);
+
+                Alert.alert('오류', '메시지 전송에 실패했습니다. 다시 시도해주세요.');
+            } finally {
+                setIsLoading(false);
+            }
         }
     };
 
-    const handleQuickSelect = (text) => {
+    const handleQuickSelect = async (text) => {
+        if (isLoading) { return; }
+
         const newMessage = {
             id: messages.length + 1,
             text: text,
             isUser: true,
         };
-        setMessages([...messages, newMessage]);
+
+        setMessages(prev => [...prev, newMessage]);
+
         setTimeout(() => {
             scrollViewRef.current?.scrollToEnd({ animated: true });
         }, 100);
-        setTimeout(() => {
-            const botResponse = {
-                id: messages.length + 2,
-                text: `${text}에 대해 도움을 드리겠습니다.`,
-                isUser: false,
-            };
-            setMessages(prev => [...prev, botResponse]);
+
+        if (text === '심전도 검사') {
             setTimeout(() => {
-                scrollViewRef.current?.scrollToEnd({ animated: true });
-            }, 100);
-        }, 1000);
+                const diagMessage = {
+                    id: messages.length + 2,
+                    text: '심전도 검사를 원하시나요?',
+                    isUser: false,
+                    showDiagButton: true,
+                };
+                setMessages(prev => [...prev, diagMessage]);
+                setTimeout(() => {
+                    scrollViewRef.current?.scrollToEnd({ animated: true });
+                }, 100);
+            }, 1000);
+        } else if (text === '심전도 검사 관련 질문') {
+            setTimeout(() => {
+                const mostMessage = {
+                    id: messages.length + 2,
+                    text: '가장 많이 한 질문을 봐보세요!',
+                    isUser: false,
+                    showMostButton: true,
+                };
+                setMessages(prev => [...prev, mostMessage]);
+                setTimeout(() => {
+                    scrollViewRef.current?.scrollToEnd({ animated: true });
+                }, 100);
+            }, 1000);
+        } else if (text === '기록 보기') {
+            setTimeout(() => {
+                const periodMessage = {
+                    id: messages.length + 2,
+                    text: '이전 기록을 확인해보세요!',
+                    isUser: false,
+                    showPeriodButton: true,
+                };
+                setMessages(prev => [...prev, periodMessage]);
+                setTimeout(() => {
+                    scrollViewRef.current?.scrollToEnd({ animated: true });
+                }, 100);
+            }, 1000);
+        } else {
+            try {
+                setIsLoading(true);
+                const response = await ask(text, currentChatId);
+
+                if (response.success && response.chat) {
+                    if (!currentChatId && response.chat.chat_id) {
+                        setCurrentChatId(response.chat.chat_id);
+                    }
+
+                    const botResponse = {
+                        id: messages.length + 2,
+                        text: response.chat.answer.content,
+                        isUser: false,
+                        isRecommend: response.chat.answer.is_recommend,
+                        isDiag: response.chat.answer.is_diag,
+                    };
+
+                    setMessages(prev => [...prev, botResponse]);
+
+                    setTimeout(() => {
+                        scrollViewRef.current?.scrollToEnd({ animated: true });
+                    }, 100);
+                }
+            } catch (error) {
+                console.error('퀵 셀렉트 에러:', error);
+                const errorResponse = {
+                    id: messages.length + 2,
+                    text: `${text}에 대해 도움을 드리겠습니다. 다시 시도해주세요.`,
+                    isUser: false,
+                };
+                setMessages(prev => [...prev, errorResponse]);
+            } finally {
+                setIsLoading(false);
+            }
+        }
     };
 
     return (
@@ -368,9 +505,34 @@ const ChatRoomScreen = ({ navigation }) => {
                         <WelcomeMessage>김미소님, 무엇을 도와드릴까요?</WelcomeMessage>
 
                         {messages.map((message) => (
-                            <ChatMessage key={message.id} isUser={message.isUser}>
-                                <ChatText>{message.text}</ChatText>
-                            </ChatMessage>
+                            <React.Fragment key={message.id}>
+                                {message.showDiagButton ? (
+                                    <ActionMessage>
+                                        <ChatText>{message.text}</ChatText>
+                                        <ActionButton onPress={() => navigation.navigate('Diag')}>
+                                            <ActionButtonText>심전도 검사 시작하기</ActionButtonText>
+                                        </ActionButton>
+                                    </ActionMessage>
+                                ) : message.showMostButton ? (
+                                    <ActionMessage>
+                                        <ChatText>{message.text}</ChatText>
+                                        <ActionButton onPress={() => navigation.navigate('ChatMost')}>
+                                            <ActionButtonText>자주 묻는 질문 보기</ActionButtonText>
+                                        </ActionButton>
+                                    </ActionMessage>
+                                ) : message.showPeriodButton ? (
+                                    <ActionMessage>
+                                        <ChatText>{message.text}</ChatText>
+                                        <ActionButton onPress={() => navigation.navigate('ChatPeriod')}>
+                                            <ActionButtonText>이전 기록 보기</ActionButtonText>
+                                        </ActionButton>
+                                    </ActionMessage>
+                                ) : (
+                                    <ChatMessage isUser={message.isUser}>
+                                        <ChatText>{message.text}</ChatText>
+                                    </ChatMessage>
+                                )}
+                            </React.Fragment>
                         ))}
 
                         {messages.length <= 2 && !keyboardVisible && (
@@ -398,10 +560,16 @@ const ChatRoomScreen = ({ navigation }) => {
                                 </SelectWrapper>
                             </>
                         )}
+
+                        {isLoading && (
+                            <ChatMessage isUser={false}>
+                                <ChatText>답변을 생성하고 있습니다...</ChatText>
+                            </ChatMessage>
+                        )}
                     </ChatScrollView>
 
                     <InputSection>
-                        <IconButton>
+                        <IconButton onPress={() => navigation.navigate('Main')}>
                             <IconImage source={require('../../../assets/home.png')} />
                         </IconButton>
                         <IconButton>
@@ -416,6 +584,7 @@ const ChatRoomScreen = ({ navigation }) => {
                                 onSubmitEditing={sendMessage}
                                 blurOnSubmit={true}
                                 returnKeyType="send"
+                                editable={!isLoading}
                             />
                         </InputWrapper>
                     </InputSection>

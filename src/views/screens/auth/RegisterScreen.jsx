@@ -178,7 +178,6 @@ const RegisterScreen = ({ navigation }) => {
     }, [enableFullScreen, disableFullScreen]);
 
     const handleRegister = async () => {
-        // 필수 입력값 체크
         if (!name.trim()) {
             Alert.alert('알림', '이름을 입력해주세요.');
             return;

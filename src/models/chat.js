@@ -12,7 +12,7 @@ export const ask = async (content, chatId = null) => {
         };
 
         const res = await axios.post(
-            `${BASE_URL}/chat/ask`,
+            `${BASE_URL}/chat`,
             requestData,
             {
                 headers: {
