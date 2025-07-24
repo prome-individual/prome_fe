@@ -1,7 +1,8 @@
 import React from 'react';
-import { TouchableOpacity, Image } from 'react-native';
+import { TouchableOpacity, Image, Alert } from 'react-native';
 import styled from 'styled-components/native';
 import Colors from '../styles/Colors';
+import { logout } from '../../models/auth';
 
 const TabBarWrapper = styled.View`
     position: absolute;
@@ -57,12 +58,39 @@ const TabLabel = styled.Text`
 `;
 
 const TabBar = ({ navigation, currentScreen = 'Home' }) => {
+    const handleLogout = () => {
+        Alert.alert(
+            "로그아웃",
+            "정말 로그아웃 하시겠습니까?",
+            [
+                {
+                    text: "취소",
+                    style: "cancel"
+                },
+                {
+                    text: "로그아웃",
+                    style: "destructive",
+                    onPress: async () => {
+                        try {
+                            await logout(); // auth.js의 logout 함수 호출
+                            navigation.navigate('Login');
+                        } catch (error) {
+                            console.error('로그아웃 실패:', error);
+                            // 로그아웃 실패해도 로그인 화면으로 이동 (토큰은 이미 클리어됨)
+                            navigation.navigate('Login');
+                        }
+                    }
+                }
+            ]
+        );
+    };
+
     const tabs = [
         {
             name: 'Profile',
             label: '',
             icon: require('../../assets/profile.png'),
-            screen: 'Main',
+            action: 'logout', // 특별한 액션 표시
         },
         {
             name: 'Home',
@@ -78,9 +106,11 @@ const TabBar = ({ navigation, currentScreen = 'Home' }) => {
         },
     ];
 
-    const handleTabPress = (screen) => {
-        if (screen !== currentScreen) {
-            navigation.navigate(screen);
+    const handleTabPress = (tab) => {
+        if (tab.action === 'logout') {
+            handleLogout();
+        } else if (tab.screen && tab.screen !== currentScreen) {
+            navigation.navigate(tab.screen);
         }
     };
 
@@ -92,7 +122,7 @@ const TabBar = ({ navigation, currentScreen = 'Home' }) => {
                 return (
                     <TabButton
                         key={index}
-                        onPress={() => handleTabPress(tab.screen)}
+                        onPress={() => handleTabPress(tab)}
                         isHome={isHome}
                     >
                         <TabIcon

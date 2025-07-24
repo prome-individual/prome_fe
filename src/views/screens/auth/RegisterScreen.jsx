@@ -4,8 +4,9 @@ import Colors from '../../styles/Colors';
 import Back from '../../common/Back';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import LinearGradient from 'react-native-linear-gradient';
-import { TouchableOpacity, ScrollView, KeyboardAvoidingView, Platform, Keyboard } from 'react-native';
+import { TouchableOpacity, ScrollView, KeyboardAvoidingView, Platform, Keyboard, Alert } from 'react-native';
 import useFullScreen from '../../hooks/useFullScreen';
+import { register } from '../../../models/auth';
 
 const SafeView = styled(SafeAreaView)`
     flex: 1;
@@ -148,13 +149,19 @@ const RegisterScreen = ({ navigation }) => {
     const [age, setAge] = useState('');
     const [phone, setPhone] = useState('');
     const [keyboardVisible, setKeyboardVisible] = useState(false);
-    
+    const [loading, setLoading] = useState(false);
+
     const { enableFullScreen, disableFullScreen } = useFullScreen();
+
+    // 랜덤 숫자 생성 함수 (6자리)
+    const generateRandomNumber = () => {
+        return Math.floor(100000 + Math.random() * 900000); // 100000~999999
+    };
 
     useEffect(() => {
         // 풀스크린 활성화
         enableFullScreen();
-        
+
         // 키보드 이벤트 리스너
         const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
             setKeyboardVisible(true);
@@ -169,6 +176,55 @@ const RegisterScreen = ({ navigation }) => {
             keyboardDidHideListener.remove();
         };
     }, [enableFullScreen, disableFullScreen]);
+
+    const handleRegister = async () => {
+        // 필수 입력값 체크
+        if (!name.trim()) {
+            Alert.alert('알림', '이름을 입력해주세요.');
+            return;
+        }
+        if (!selectedGender) {
+            Alert.alert('알림', '성별을 선택해주세요.');
+            return;
+        }
+        if (!age.trim()) {
+            Alert.alert('알림', '나이를 입력해주세요.');
+            return;
+        }
+        if (!phone.trim()) {
+            Alert.alert('알림', '전화번호를 입력해주세요.');
+            return;
+        }
+
+        const randomNum = generateRandomNumber();
+        const autoId = `test${randomNum}`;
+        const autoPassword = `test${randomNum}`;
+
+        const genderValue = selectedGender === '남자' ? 'male' : 'female';
+
+        setLoading(true);
+
+        try {
+            const result = await register(autoId, autoPassword, name.trim(), parseInt(age), genderValue, phone.trim());
+            console.log('회원가입 성공:', result);
+            Alert.alert(
+                '회원가입 완료!',
+                `ID: ${autoId}\nPassword: ${autoPassword}\n\n위 정보로 로그인하세요!`,
+                [
+                    {
+                        text: '확인',
+                        onPress: () => navigation.navigate('Login'),
+                    },
+                ]
+            );
+
+        } catch (error) {
+            console.error('회원가입 에러:', error);
+            Alert.alert('오류', '회원가입 중 오류가 발생했습니다.');
+        } finally {
+            setLoading(false);
+        }
+    };
 
     return (
         <SafeView edges={[]}>
@@ -265,13 +321,10 @@ const RegisterScreen = ({ navigation }) => {
                             />
                         </StepContainer>
 
-                        <SubmitButton
-                            onPress={() => {
-                                console.log('회원가입 데이터:', { name, selectedGender, age, phone });
-                                navigation.navigate('OK');
-                            }}
-                        >
-                            <SubmitButtonText>다음</SubmitButtonText>
+                        <SubmitButton onPress={handleRegister} disabled={loading}>
+                            <SubmitButtonText>
+                                {loading ? '처리중...' : '다음'}
+                            </SubmitButtonText>
                         </SubmitButton>
                     </FormContainer>
                 </KeyboardAvoidingView>
