@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
 import { TouchableOpacity, Image, Alert, PermissionsAndroid, Platform, Modal, TextInput } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import styled from 'styled-components/native';
 import Colors from '../../styles/Colors';
-import { launchImageLibrary, launchCamera } from 'react-native-image-picker';
+import { launchImageLibrary } from 'react-native-image-picker';
 
 const Container = styled.View`
     flex: 1;
@@ -26,6 +25,7 @@ const UploadedImage = styled(Image)`
     width: 100%;
     height: 100%;
     border-radius: 10px;
+    resize-mode: contain;
 `;
 
 const CameraIcon = styled.View`
@@ -71,11 +71,6 @@ const StepLeftContent = styled.View`
     flex: 1;
 `;
 
-const StepRightContent = styled.View`
-    flex-direction: row;
-    align-items: center;
-`;
-
 const StepText = styled.Text`
     font-size: 16px;
     color: #333;
@@ -92,11 +87,6 @@ const StepValue = styled.Text`
     color: ${Colors.primary};
     font-weight: 600;
     margin-right: 10px;
-`;
-
-const EditIcon = styled.Text`
-    font-size: 16px;
-    color: #666;
 `;
 
 const SubmitButton = styled(TouchableOpacity)`
@@ -117,7 +107,6 @@ const Bold = styled.Text`
     font-weight: 700;
 `;
 
-// 모달 스타일들
 const ModalOverlay = styled.View`
     flex: 1;
     background-color: rgba(0, 0, 0, 0.5);
@@ -165,6 +154,25 @@ const UnitText = styled.Text`
     margin-top: 5px;
 `;
 
+const SelectionContainer = styled.View`
+    margin-bottom: 20px;
+`;
+
+const OptionButton = styled(TouchableOpacity)`
+    background-color: ${props => props.selected ? Colors.primary : 'white'};
+    border: 2px solid ${Colors.primary};
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 10px;
+    align-items: center;
+    justify-content: center;
+`;
+
+const OptionText = styled.Text`
+    font-size: 16px;
+    font-weight: 600;
+`;
+
 const ModalButtonContainer = styled.View`
     flex-direction: row;
     justify-content: space-between;
@@ -210,7 +218,15 @@ const DiagResultScreen = ({ navigation, closeModal }) => {
     const [ecgModalVisible, setEcgModalVisible] = useState(false);
 
     const [tempInput, setTempInput] = useState('');
-    const [ecgInput, setEcgInput] = useState('');
+    const [selectedEcgOption, setSelectedEcgOption] = useState('');
+
+    const ecgOptions = [
+        '정상',
+        '심방성 부정맥 의심',
+        '심실성 부정맥 의심',
+        '융합 박동',
+        '알 수 없음',
+    ];
 
     const requestPermissions = async () => {
         if (Platform.OS === 'android') {
@@ -237,10 +253,10 @@ const DiagResultScreen = ({ navigation, closeModal }) => {
     const showImagePicker = () => {
         Alert.alert(
             '이미지 선택',
-            '이미지를 업로드해주세요!',
+            '심전도 분석 결과를 올려주세요!',
             [
                 { text: '취소', style: 'cancel' },
-                { text: '갤러리', onPress: selectFromGallery },
+                { text: '선택', onPress: selectFromGallery },
             ]
         );
     };
@@ -270,38 +286,13 @@ const DiagResultScreen = ({ navigation, closeModal }) => {
         });
     };
 
-    const selectFromCamera = async () => {
-        const hasPermission = await requestPermissions();
-        if (!hasPermission) {
-            Alert.alert('권한 필요', '카메라 접근 권한이 필요합니다.');
-            return;
-        }
-
-        const options = {
-            mediaType: 'photo',
-            quality: 0.8,
-            maxWidth: 1000,
-            maxHeight: 1000,
-        };
-
-        launchCamera(options, (response) => {
-            if (response.didCancel || response.error) {
-                return;
-            }
-
-            if (response.assets && response.assets[0]) {
-                setSelectedImage(response.assets[0]);
-            }
-        });
-    };
-
     const openTempModal = () => {
         setTempInput(temperature);
         setTempModalVisible(true);
     };
 
     const openEcgModal = () => {
-        setEcgInput(ecgResult);
+        setSelectedEcgOption(ecgResult);
         setEcgModalVisible(true);
     };
 
@@ -311,33 +302,27 @@ const DiagResultScreen = ({ navigation, closeModal }) => {
             return;
         }
 
-        const temp = parseFloat(tempInput);
-        if (isNaN(temp) || temp < 30 || temp > 45) {
-            Alert.alert('알림', '올바른 체온을 입력해주세요. (30°C - 45°C)');
-            return;
-        }
-
         setTemperature(tempInput);
         setTempModalVisible(false);
         setTempInput('');
     };
 
     const saveEcgValue = () => {
-        if (!ecgInput.trim()) {
-            Alert.alert('알림', '심전도 검사 결과를 입력해주세요.');
+        if (!selectedEcgOption) {
+            Alert.alert('알림', '심전도 검사 결과를 선택해주세요.');
             return;
         }
 
-        setEcgResult(ecgInput);
+        setEcgResult(selectedEcgOption);
         setEcgModalVisible(false);
-        setEcgInput('');
+        setSelectedEcgOption('');
     };
 
     const cancelModal = () => {
         setTempModalVisible(false);
         setEcgModalVisible(false);
         setTempInput('');
-        setEcgInput('');
+        setSelectedEcgOption('');
     };
 
     const handleSubmit = () => {
@@ -352,9 +337,11 @@ const DiagResultScreen = ({ navigation, closeModal }) => {
         }
 
         if (!ecgResult) {
-            Alert.alert('알림', '심전도 검사 결과를 입력해주세요.');
+            Alert.alert('알림', '심전도 검사 결과를 선택해주세요.');
             return;
         }
+
+        navigation.navigate('Chat');
 
         console.log('검사결과 제출:', { selectedImage, temperature, ecgResult });
         Alert.alert(
@@ -395,9 +382,9 @@ const DiagResultScreen = ({ navigation, closeModal }) => {
                     <StepLeftContent>
                         <StepNumber>Step 2.</StepNumber>
                         {ecgResult ? (
-                            <StepValue>{ecgResult.length > 20 ? ecgResult.substring(0, 20) + '...' : ecgResult}</StepValue>
+                            <StepValue>{ecgResult}</StepValue>
                         ) : (
-                            <StepText>심전도 검사 결과 입력</StepText>
+                            <StepText>심전도 검사 결과 선택</StepText>
                         )}
                     </StepLeftContent>
                 </StepButton>
@@ -447,19 +434,21 @@ const DiagResultScreen = ({ navigation, closeModal }) => {
             >
                 <ModalOverlay>
                     <ModalContainer>
-                        <ModalTitle>{ecgResult ? ecgResult : '심전도 검사 결과 입력'}</ModalTitle>
-                        <InputContainer>
-                            <InputLabel>심전도 검사 결과를 입력해주세요</InputLabel>
-                            <Input
-                                value={ecgInput}
-                                onChangeText={setEcgInput}
-                                placeholder="예: 정상 심전도, 심박수 72회/분"
-                                multiline={true}
-                                numberOfLines={3}
-                                autoFocus={true}
-                            />
-                            <UnitText>검사 결과나 의사 소견을 입력해주세요</UnitText>
-                        </InputContainer>
+                        <ModalTitle>심전도 검사 결과 선택</ModalTitle>
+                        <SelectionContainer>
+                            <InputLabel>해당되는 검사 결과를 선택해주세요</InputLabel>
+                            {ecgOptions.map((option, index) => (
+                                <OptionButton
+                                    key={index}
+                                    selected={selectedEcgOption === option}
+                                    onPress={() => setSelectedEcgOption(option)}
+                                >
+                                    <OptionText selected={selectedEcgOption === option}>
+                                        {option}
+                                    </OptionText>
+                                </OptionButton>
+                            ))}
+                        </SelectionContainer>
                         <ModalButtonContainer>
                             <CancelButton onPress={cancelModal}>
                                 <CancelButtonText>취소</CancelButtonText>

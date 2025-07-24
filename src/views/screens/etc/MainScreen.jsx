@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { TouchableOpacity, Image, Alert } from 'react-native';
 import styled from 'styled-components/native';
-import Back from '../../common/Back';
 import Colors from '../../styles/Colors';
 import TabBar from '../../common/TabBar';
 import Hospital from '../../components/etc/Hospital';

@@ -133,7 +133,6 @@ const DiagButtonText = styled.Text`
     font-weight: 600;
 `;
 
-// 모달 관련 스타일
 const ModalOverlay = styled.View`
     flex: 1;
     background-color: rgba(31, 31, 31, 0.3);
@@ -264,7 +263,6 @@ const DiagScreen = ({ navigation }) => {
                     </BottomSection>
                 </KeyboardAvoidingView>
 
-                {/* 모달 */}
                 <Modal
                     visible={isModalVisible}
                     transparent={true}

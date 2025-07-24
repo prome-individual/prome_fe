@@ -62,6 +62,11 @@ const FindHistoryRightText = styled.Text`
 `;
 
 function History({ navigation }) {
+    // 각 기간별 네비게이션 핸들러
+    const handlePeriodPress = (period) => {
+        navigation.navigate('ChatPeriod', { selectedPeriod: period });
+    };
+
     return (
         <HistoryWrapper>
             <FindHistory>
@@ -74,15 +79,15 @@ function History({ navigation }) {
                 </FindHistoryLeft>
             </FindHistory>
             <FindHistory>
-                <FindHistoryRight>
+                <FindHistoryRight onPress={() => handlePeriodPress(7)}>
                     <FindHistoryRightVector source={require('../../../assets/history_vector.png')} alt="기록벡터" />
                     <FindHistoryRightText>7일 이내</FindHistoryRightText>
                 </FindHistoryRight>
-                <FindHistoryRight>
+                <FindHistoryRight onPress={() => handlePeriodPress(30)}>
                     <FindHistoryRightVector source={require('../../../assets/history_vector.png')} alt="기록벡터" />
                     <FindHistoryRightText>한달 이내</FindHistoryRightText>
                 </FindHistoryRight>
-                <FindHistoryRight>
+                <FindHistoryRight onPress={() => handlePeriodPress(90)}>
                     <FindHistoryRightVector source={require('../../../assets/history_vector.png')} alt="기록벡터" />
                     <FindHistoryRightText>3개월 이내</FindHistoryRightText>
                 </FindHistoryRight>

@@ -30,13 +30,15 @@ export const ask = async (content, chatId = null) => {
     }
 };
 
-export const getChatAll = async () => {
+// getChatAll 함수를 getAllChats로 변경하고 period API를 사용
+export const getAllChats = async (days = 365) => {  // 기본값을 1년으로 설정해서 전체 조회
     try {
         const accessToken = useAuthStore.getState().accessToken;
 
         const res = await axios.get(
-            `${BASE_URL}/chat`,
+            `${BASE_URL}/chat/period`,
             {
+                params: { period: days },
                 headers: {
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${accessToken}`,
@@ -116,6 +118,29 @@ export const getChat30Period = async () => {
         return res.data;
     } catch (e) {
         console.error('30일 채팅 조회 에러:', e);
+        throw e;
+    }
+};
+
+export const getChatByPeriod = async (days) => {
+    try {
+        const accessToken = useAuthStore.getState().accessToken;
+
+        const res = await axios.get(
+            `${BASE_URL}/chat/period`,
+            {
+                params: { period: days },
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${accessToken}`,
+                },
+                withCredentials: true,
+            }
+        );
+
+        return res.data;
+    } catch (e) {
+        console.error(`${days}일 채팅 조회 에러:`, e);
         throw e;
     }
 };
