@@ -29,8 +29,8 @@
         android:requestLegacyExternalStorage="true">
         
         <meta-data
-            android:name="com.naver.maps.map.CLIENT_ID"
-            android:value="my-naver-client-id" />
+            android:name="com.naver.maps.map.NCP_KEY_ID"
+            android:value="28igedszsf" />
             
         <activity
             android:name=".MainActivity"
