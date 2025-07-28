@@ -11,6 +11,7 @@ import ChatMostScreen from '../views/screens/chat/ChatMostScreen';
 import ChatRoomHistoryScreen from '../views/screens/chat/ChatRoomHistoryScreen';
 
 import DiagScreen from '../views/screens/diag/DiagScreen';
+import DiagResultHistoryScreen from '../views/screens/diag/DiagResultHistoryScreen';
 
 import DescriptionScreen from '../views/screens/etc/DescriptionScreen';
 import MainScreen from '../views/screens/etc/MainScreen';
@@ -54,6 +55,10 @@ const StackNavigator = () => {
             />
             <Stack.Screen name="Diag"
                 component={DiagScreen}
+                options={{ headerShown: false, animation: 'none'}}
+            />
+            <Stack.Screen name="DiagResult"
+                component={DiagResultHistoryScreen}
                 options={{ headerShown: false, animation: 'none'}}
             />
             <Stack.Screen name="Description"

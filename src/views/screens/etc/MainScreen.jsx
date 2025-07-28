@@ -176,7 +176,7 @@ const SelectText = styled.Text`
 `;
 
 const MainScreen = ({ navigation }) => {
-    const [selectedTab, setSelectedTab] = useState('병원찾기');
+    const [selectedTab, setSelectedTab] = useState('이전기록');
 
     const handleDiag = () => {
         Alert.alert(

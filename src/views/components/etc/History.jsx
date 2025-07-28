@@ -70,7 +70,7 @@ function History({ navigation }) {
     return (
         <HistoryWrapper>
             <FindHistory>
-                <FindHistoryLeft onPress={() => navigation.navigate('Diag')}>
+                <FindHistoryLeft onPress={() => navigation.navigate('DiagResult')}>
                     <FindHistoryLeftText style={{ fontSize: 18, paddingTop: 15, paddingLeft: 10, fontWeight: 600 }}>방금 한 검사 !</FindHistoryLeftText>
                     <FindHistoryImagWrapper>
                         <FindHistoryLeftImg source={require('../../../assets/diag.png')} alt="검사 확인" />
