@@ -326,10 +326,10 @@ const DiagResultScreen = ({ navigation, closeModal }) => {
     };
 
     const handleSubmit = () => {
-        if (!selectedImage) {
-            Alert.alert('알림', '심전도 이미지를 업로드해주세요.');
-            return;
-        }
+        // if (!selectedImage) {
+        //     Alert.alert('알림', '심전도 이미지를 업로드해주세요.');
+        //     return;
+        // }
 
         if (!temperature) {
             Alert.alert('알림', '체온을 입력해주세요.');

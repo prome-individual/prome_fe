@@ -131,7 +131,7 @@ const OKScreen = ({ navigation }) => {
                         }}
                     />
                 </Kongs>
-                <Button onPress={() => navigation.navigate('Register')}>
+                <Button onPress={() => navigation.navigate('Login')}>
                     <ButtonText>다음</ButtonText>
                 </Button>
             </Container>

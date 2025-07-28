@@ -236,7 +236,7 @@ const LoginScreen = ({ navigation }) => {
 
                         <SignUpContainer>
                             <SignUpText>계정이 없으신가요?</SignUpText>
-                            <SignUpLink onPress={() => navigation.navigate('OK')}>
+                            <SignUpLink onPress={() => navigation.navigate('Register')}>
                                 <SignUpLinkText>회원가입</SignUpLinkText>
                             </SignUpLink>
                         </SignUpContainer>
