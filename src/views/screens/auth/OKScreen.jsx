@@ -4,7 +4,6 @@ import { TouchableOpacity, Image } from 'react-native';
 import styled from 'styled-components';
 import Colors from '../../styles/Colors';
 import LinearGradient from 'react-native-linear-gradient';
-import Back from '../../common/Back';
 
 const SafeView = styled(SafeAreaView)`
     flex: 1;
@@ -86,7 +85,6 @@ const OKScreen = ({ navigation }) => {
     return (
         <SafeView>
             <Container>
-                <Back navigation={navigation}/>
                 <Gradient />
                 <Welcome>
                     <WelcomeTitle>환영합니다 !</WelcomeTitle>

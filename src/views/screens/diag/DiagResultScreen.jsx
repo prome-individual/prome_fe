@@ -228,6 +228,18 @@ const DiagResultScreen = ({ navigation, closeModal }) => {
         '알 수 없음',
     ];
 
+    // ECG 결과를 숫자로 변환하는 함수
+    const getEcgCode = (ecgR) => {
+        const ecgMap = {
+            '정상': 0,
+            '심방성 부정맥 의심': 1,
+            '심실성 부정맥 의심': 2,
+            '융합 박동': 3,
+            '알 수 없음': 4,
+        };
+        return ecgMap[ecgR] || 4;
+    };
+
     const requestPermissions = async () => {
         if (Platform.OS === 'android') {
             try {
@@ -326,10 +338,6 @@ const DiagResultScreen = ({ navigation, closeModal }) => {
     };
 
     const handleSubmit = () => {
-        // if (!selectedImage) {
-        //     Alert.alert('알림', '심전도 이미지를 업로드해주세요.');
-        //     return;
-        // }
 
         if (!temperature) {
             Alert.alert('알림', '체온을 입력해주세요.');
@@ -341,14 +349,19 @@ const DiagResultScreen = ({ navigation, closeModal }) => {
             return;
         }
 
-        navigation.navigate('Chat');
+        // 검사 결과 데이터를 채팅 화면으로 전달
+        const diagnosisData = {
+            temp: parseFloat(temperature),
+            ecg: getEcgCode(ecgResult),
+            content: '내 검사 결과를 바탕으로 날 진단해줘',
+        };
 
-        console.log('검사결과 제출:', { selectedImage, temperature, ecgResult });
-        Alert.alert(
-            '제출 완료',
-            '검사결과가 성공적으로 제출되었습니다.',
-            [{ text: '확인', onPress: closeModal }]
-        );
+        navigation.navigate('Chat', { diagnosisData });
+
+        console.log('검사결과 제출:', { selectedImage, temperature, ecgResult, diagnosisData });
+        if (closeModal) {
+            closeModal();
+        }
     };
 
     return (

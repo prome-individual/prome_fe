@@ -253,7 +253,7 @@ const ActionButtonText = styled.Text`
     font-weight: 600;
 `;
 
-const ChatRoomScreen = ({ navigation }) => {
+const ChatRoomScreen = ({ navigation, route }) => {
     const { enableFullScreen, disableFullScreen } = useFullScreen();
     const [keyboardVisible, setKeyboardVisible] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
@@ -281,6 +281,71 @@ const ChatRoomScreen = ({ navigation }) => {
     ]);
     const [inputText, setInputText] = useState('');
     const scrollViewRef = useRef(null);
+
+    useEffect(() => {
+        if (route.params?.diagnosisData) {
+            const { diagnosisData } = route.params;
+
+            const diagnosisMessage = {
+                id: messages.length + 1,
+                text: diagnosisData.content,
+                isUser: true,
+                diagnosisData: {
+                    temp: diagnosisData.temp,
+                    ecg: diagnosisData.ecg,
+                },
+            };
+
+            setMessages(prev => [...prev, diagnosisMessage]);
+
+            handleDiagnosisRequest(diagnosisData);
+            navigation.setParams({ diagnosisData: null });
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [route.params?.diagnosisData]);
+
+    const handleDiagnosisRequest = async (diagnosisData) => {
+        setIsLoading(true);
+
+        try {
+            const response = await ask(diagnosisData.content, currentChatId, {
+                temperature: diagnosisData.temp,
+                ecgResult: diagnosisData.ecg,
+            });
+
+            if (response.success && response.chat) {
+                if (!currentChatId && response.chat.chat_id) {
+                    setCurrentChatId(response.chat.chat_id);
+                }
+
+                const botResponse = {
+                    id: messages.length + 2,
+                    text: response.chat.answer.content,
+                    isUser: false,
+                    isRecommend: response.chat.answer.is_recommend,
+                    isDiag: response.chat.answer.is_diag,
+                };
+
+                setMessages(prev => [...prev, botResponse]);
+
+                setTimeout(() => {
+                    scrollViewRef.current?.scrollToEnd({ animated: true });
+                }, 100);
+            } else {
+                throw new Error('진단 응답을 받을 수 없습니다.');
+            }
+        } catch (error) {
+            console.error('진단 요청 오류:', error);
+            const errorMessage = {
+                id: messages.length + 2,
+                text: '진단 처리 중 오류가 발생했습니다. 다시 시도해 주세요.',
+                isUser: false,
+            };
+            setMessages(prev => [...prev, errorMessage]);
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     const sendMessage = async () => {
         if (inputText.trim() && !isLoading) {
@@ -525,6 +590,22 @@ const ChatRoomScreen = ({ navigation }) => {
                                         <ChatText>{message.text}</ChatText>
                                         <ActionButton onPress={() => navigation.navigate('ChatPeriod')}>
                                             <ActionButtonText>이전 기록 보기</ActionButtonText>
+                                        </ActionButton>
+                                    </ActionMessage>
+                                ) : message.isRecommend && !message.isUser ? (
+                                    // isRecommend가 true일 때 병원 찾기 버튼 표시
+                                    <ActionMessage>
+                                        <ChatText>{message.text}</ChatText>
+                                        <ActionButton onPress={() => navigation.navigate('Map')}>
+                                            <ActionButtonText>병원 찾기</ActionButtonText>
+                                        </ActionButton>
+                                    </ActionMessage>
+                                ) : message.isDiag && !message.isUser ? (
+                                    // isDiag가 true일 때 심전도 검사 버튼 표시
+                                    <ActionMessage>
+                                        <ChatText>{message.text}</ChatText>
+                                        <ActionButton onPress={() => navigation.navigate('Diag')}>
+                                            <ActionButtonText>심전도 검사 시작하기</ActionButtonText>
                                         </ActionButton>
                                     </ActionMessage>
                                 ) : (
