@@ -226,7 +226,6 @@ const DiagResultScreen = ({ navigation, closeModal }) => {
         '알 수 없음',
     ];
 
-    // ECG 결과에 따른 이미지 매핑
     const getEcgImage = (ecgR) => {
         const imageMap = {
             '정상': require('../../../assets/diag_0.png'),
@@ -300,7 +299,6 @@ const DiagResultScreen = ({ navigation, closeModal }) => {
             return;
         }
 
-        // 검사 결과 데이터를 채팅 화면으로 전달
         const diagnosisData = {
             temp: parseFloat(temperature),
             ecg: getEcgCode(ecgResult),

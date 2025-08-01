@@ -1,5 +1,6 @@
 import { TouchableOpacity, Image } from 'react-native';
 import styled from 'styled-components';
+import LinearGradient from 'react-native-linear-gradient';
 
 const HistoryWrapper = styled.View`
     flex: 1;
@@ -12,14 +13,22 @@ const HistoryWrapper = styled.View`
 const FindHistory = styled.View`
     flex: 1;
     width: 40%;
-    
 `;
 
 const FindHistoryLeft = styled(TouchableOpacity)`
     flex: 1;
     border: 1px solid #BCBCBC;
     border-radius: 12px;
-    background-color: white;
+    overflow: hidden;
+`;
+
+const FindHistoryLeftGradient = styled(LinearGradient).attrs({
+    colors: ['rgba(252, 70, 70, 0.23)', 'rgba(255, 255, 255, 1)'],
+    start: {x: 1, y: 1},
+    end: {x: 0, y: 0},
+})`
+    flex: 1;
+    justify-content: center;
 `;
 
 const FindHistoryLeftText = styled.Text`
@@ -62,7 +71,6 @@ const FindHistoryRightText = styled.Text`
 `;
 
 function History({ navigation }) {
-    // 각 기간별 네비게이션 핸들러
     const handlePeriodPress = (period) => {
         navigation.navigate('ChatPeriod', { selectedPeriod: period });
     };
@@ -71,11 +79,13 @@ function History({ navigation }) {
         <HistoryWrapper>
             <FindHistory>
                 <FindHistoryLeft onPress={() => navigation.navigate('DiagResult')}>
-                    <FindHistoryLeftText style={{ fontSize: 18, paddingTop: 15, paddingLeft: 10, fontWeight: 600 }}>방금 한 검사 !</FindHistoryLeftText>
-                    <FindHistoryImagWrapper>
-                        <FindHistoryLeftImg source={require('../../../assets/diag.png')} alt="검사 확인" />
-                        <FindHistoryLeftText style={{ fontSize: 14, paddingLeft: 10, paddingTop: 20 }}>확인해 보세요</FindHistoryLeftText>
-                    </FindHistoryImagWrapper>
+                    <FindHistoryLeftGradient>
+                        <FindHistoryLeftText style={{ fontSize: 18, paddingTop: 15, paddingLeft: 10, fontWeight: 600 }}>방금 한 검사 !</FindHistoryLeftText>
+                        <FindHistoryImagWrapper>
+                            <FindHistoryLeftImg source={require('../../../assets/diag.png')} alt="검사 확인" />
+                            <FindHistoryLeftText style={{ fontSize: 14, paddingLeft: 10, paddingTop: 20 }}>확인해 보세요</FindHistoryLeftText>
+                        </FindHistoryImagWrapper>
+                    </FindHistoryLeftGradient>
                 </FindHistoryLeft>
             </FindHistory>
             <FindHistory>

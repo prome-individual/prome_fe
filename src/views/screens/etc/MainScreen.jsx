@@ -13,7 +13,7 @@ const SafeView = styled(SafeAreaView)`
 
 const Container = styled.View`
     flex: 1;
-    background-color: white;
+    background-color: #F6FDFF;
     width: 100%;
 `;
 

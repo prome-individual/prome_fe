@@ -1,6 +1,6 @@
-import { TouchableOpacity } from 'react-native';
+import { TouchableOpacity, Image } from 'react-native';
 import styled from 'styled-components';
-import Colors from '../../styles/Colors';
+import LinearGradient from 'react-native-linear-gradient';
 
 const FindHospitalWrapper = styled.View`
     flex: 1;
@@ -14,14 +14,20 @@ const FindHospital = styled(TouchableOpacity)`
     width: 40%;
     border: 1px solid #BCBCBC;
     border-radius: 12px;
-    justify-content: center;
-    background-color: white;
+    overflow: hidden;
 `;
 
-const FindHospitalText = styled.Text`
-    font-size: 14px;
-    color: ${Colors.primary};
-    text-align: center;
+const FindHospitalGradient = styled(LinearGradient).attrs({
+    colors: ['rgba(252, 70, 70, 0.23)', 'rgba(255, 255, 255, 1)'],
+    start: {x: 1, y: 1},
+    end: {x: 0, y: 0},
+})`
+    flex: 1;
+    justify-content: center;
+`;
+
+const MapImg = styled(Image)`
+    align-self: center;
 `;
 
 function Hospital({ navigation }) {
@@ -32,10 +38,14 @@ function Hospital({ navigation }) {
     return (
         <FindHospitalWrapper>
             <FindHospital onPress={() => handleHospitalSearch('모든 병원')}>
-                <FindHospitalText>모든 병원 찾기</FindHospitalText>
+                <FindHospitalGradient>
+                    <MapImg source={require('../../../assets/total_map.png')} />
+                </FindHospitalGradient>
             </FindHospital>
             <FindHospital onPress={() => handleHospitalSearch('심전도 병원')}>
-                <FindHospitalText>심전도 병원 찾기</FindHospitalText>
+                <FindHospitalGradient>
+                    <MapImg source={require('../../../assets/heart_map.png')} />
+                </FindHospitalGradient>
             </FindHospital>
         </FindHospitalWrapper>
     );
