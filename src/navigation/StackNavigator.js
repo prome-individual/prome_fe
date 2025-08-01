@@ -3,7 +3,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 import LoginScreen from '../views/screens/auth/LoginScreen';
 import RegisterScreen from '../views/screens/auth/RegisterScreen';
-import OKScreen from '../views/screens/auth/OKScreen';
+import NextScreen from '../views/screens/auth/NextScreen';
 
 import ChatRoomScreen from '../views/screens/chat/ChatRoomScreen';
 import ChatPeriodSelectScreen from '../views/screens/chat/ChatPeriodSelectScreen';
@@ -24,7 +24,7 @@ const Stack = createNativeStackNavigator();
 
 const StackNavigator = () => {
     return (
-        <Stack.Navigator initialRouteName="OK">
+        <Stack.Navigator initialRouteName="Next">
             <Stack.Screen name="Login"
                 component={LoginScreen}
                 options={{ headerShown: false, animation: 'none'}}
@@ -32,10 +32,6 @@ const StackNavigator = () => {
             <Stack.Screen name="Register"
                 component={RegisterScreen}
                 options={{ headerShown: false, animation: 'none'}}
-            />
-            <Stack.Screen name="OK"
-                component={OKScreen}
-                options={{headerShown: false, animation: 'none'}}
             />
             <Stack.Screen name="Chat"
                 component={ChatRoomScreen}
@@ -79,6 +75,10 @@ const StackNavigator = () => {
             />
             <Stack.Screen name="Call"
                 component={CallScreen}
+                options={{ headerShown: false, animation: 'none' }}
+            />
+            <Stack.Screen name="Next"
+                component={NextScreen}
                 options={{ headerShown: false, animation: 'none' }}
             />
         </Stack.Navigator>

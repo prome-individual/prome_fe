@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
-import { TouchableOpacity, Image, Alert, PermissionsAndroid, Platform, Modal, TextInput } from 'react-native';
+import { TouchableOpacity, Image, Alert, Modal, TextInput } from 'react-native';
 import styled from 'styled-components/native';
 import Colors from '../../styles/Colors';
-import { launchImageLibrary } from 'react-native-image-picker';
 
 const Container = styled.View`
     flex: 1;
@@ -10,15 +9,15 @@ const Container = styled.View`
     padding: 20px;
 `;
 
-const ImageUploadContainer = styled(TouchableOpacity)`
+const ImageUploadContainer = styled.View`
     width: 100%;
-    height: 200px;
+    height: 150px;
     background-color: #f5f5f5;
     border: 2px dashed #ddd;
     border-radius: 12px;
     justify-content: center;
     align-items: center;
-    margin-bottom: 30px;
+    margin-bottom: 60px;
 `;
 
 const UploadedImage = styled(Image)`
@@ -31,7 +30,6 @@ const UploadedImage = styled(Image)`
 const CameraIcon = styled.View`
     width: 60px;
     height: 60px;
-    background-color: #ddd;
     border-radius: 30px;
     justify-content: center;
     align-items: center;
@@ -171,6 +169,7 @@ const OptionButton = styled(TouchableOpacity)`
 const OptionText = styled.Text`
     font-size: 16px;
     font-weight: 600;
+    color: ${props => props.selected ? 'white' : '#333'};
 `;
 
 const ModalButtonContainer = styled.View`
@@ -210,7 +209,6 @@ const SaveButtonText = styled(ModalButtonText)`
 `;
 
 const DiagResultScreen = ({ navigation, closeModal }) => {
-    const [selectedImage, setSelectedImage] = useState(null);
     const [temperature, setTemperature] = useState('');
     const [ecgResult, setEcgResult] = useState('');
 
@@ -228,6 +226,18 @@ const DiagResultScreen = ({ navigation, closeModal }) => {
         '알 수 없음',
     ];
 
+    // ECG 결과에 따른 이미지 매핑
+    const getEcgImage = (ecgR) => {
+        const imageMap = {
+            '정상': require('../../../assets/diag_0.png'),
+            '심방성 부정맥 의심': require('../../../assets/diag_1.png'),
+            '심실성 부정맥 의심': require('../../../assets/diag_2.png'),
+            '융합 박동': require('../../../assets/diag_3.png'),
+            '알 수 없음': require('../../../assets/diag_4.png'),
+        };
+        return imageMap[ecgR];
+    };
+
     // ECG 결과를 숫자로 변환하는 함수
     const getEcgCode = (ecgR) => {
         const ecgMap = {
@@ -238,64 +248,6 @@ const DiagResultScreen = ({ navigation, closeModal }) => {
             '알 수 없음': 4,
         };
         return ecgMap[ecgR] || 4;
-    };
-
-    const requestPermissions = async () => {
-        if (Platform.OS === 'android') {
-            try {
-                const granted = await PermissionsAndroid.requestMultiple([
-                    PermissionsAndroid.PERMISSIONS.CAMERA,
-                    PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
-                    PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
-                ]);
-
-                return (
-                    granted['android.permission.CAMERA'] === PermissionsAndroid.RESULTS.GRANTED &&
-                    granted['android.permission.READ_EXTERNAL_STORAGE'] === PermissionsAndroid.RESULTS.GRANTED &&
-                    granted['android.permission.WRITE_EXTERNAL_STORAGE'] === PermissionsAndroid.RESULTS.GRANTED
-                );
-            } catch (err) {
-                console.warn(err);
-                return false;
-            }
-        }
-        return true;
-    };
-
-    const showImagePicker = () => {
-        Alert.alert(
-            '이미지 선택',
-            '심전도 분석 결과를 올려주세요!',
-            [
-                { text: '취소', style: 'cancel' },
-                { text: '선택', onPress: selectFromGallery },
-            ]
-        );
-    };
-
-    const selectFromGallery = async () => {
-        const hasPermission = await requestPermissions();
-        if (!hasPermission) {
-            Alert.alert('권한 필요', '갤러리 접근 권한이 필요합니다.');
-            return;
-        }
-
-        const options = {
-            mediaType: 'photo',
-            quality: 0.8,
-            maxWidth: 1000,
-            maxHeight: 1000,
-        };
-
-        launchImageLibrary(options, (response) => {
-            if (response.didCancel || response.error) {
-                return;
-            }
-
-            if (response.assets && response.assets[0]) {
-                setSelectedImage(response.assets[0]);
-            }
-        });
     };
 
     const openTempModal = () => {
@@ -338,7 +290,6 @@ const DiagResultScreen = ({ navigation, closeModal }) => {
     };
 
     const handleSubmit = () => {
-
         if (!temperature) {
             Alert.alert('알림', '체온을 입력해주세요.');
             return;
@@ -358,7 +309,7 @@ const DiagResultScreen = ({ navigation, closeModal }) => {
 
         navigation.navigate('Chat', { diagnosisData });
 
-        console.log('검사결과 제출:', { selectedImage, temperature, ecgResult, diagnosisData });
+        console.log('검사결과 제출:', { temperature, ecgResult, diagnosisData });
         if (closeModal) {
             closeModal();
         }
@@ -366,15 +317,15 @@ const DiagResultScreen = ({ navigation, closeModal }) => {
 
     return (
         <Container>
-            <ImageUploadContainer onPress={showImagePicker}>
-                {selectedImage ? (
-                    <UploadedImage source={{ uri: selectedImage.uri }} />
+            <ImageUploadContainer>
+                {ecgResult ? (
+                    <UploadedImage source={getEcgImage(ecgResult)} />
                 ) : (
                     <>
                         <CameraIcon>
                             <CameraIconImage source={require('../../../assets/camera.png')} />
                         </CameraIcon>
-                        <UploadText>파일 사진을 업로드해주세요</UploadText>
+                        <UploadText>심전도 검사 결과를 선택하면{'\n'}해당 이미지가 표시됩니다</UploadText>
                     </>
                 )}
             </ImageUploadContainer>
