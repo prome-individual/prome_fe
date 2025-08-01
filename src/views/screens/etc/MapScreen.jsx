@@ -157,22 +157,19 @@ const MapScreen = ({ navigation, route }) => {
     const [hospitalLoading, setHospitalLoading] = useState(true);
     const [searchCenter, setSearchCenter] = useState(null);
     const [currentCamera, setCurrentCamera] = useState(null);
-    
-    // 모달 관련 state
+
     const [modalVisible, setModalVisible] = useState(false);
     const [selectedHospital, setSelectedHospital] = useState(null);
 
-    // route params에서 병원 타입 확인
     const { hospitalType = '모든 병원' } = route?.params || {};
 
-    // API에서 병원 데이터 가져오기
     const fetchHospitals = useCallback(async () => {
         try {
             setHospitalLoading(true);
             console.log(`병원 데이터 가져오기 시작 - 타입: ${hospitalType}`);
-            
+
             let response;
-            
+
             if (hospitalType === '심전도 병원') {
                 console.log('heartMap() API 호출 중...');
                 response = await heartMap();
@@ -205,7 +202,7 @@ const MapScreen = ({ navigation, route }) => {
             const hospitalData = hospitalArray.map((hospital, index) => {
                 const lat = parseFloat(hospital.lat || hospital['좌표(Y)'] || hospital.latitude || 0);
                 const long = parseFloat(hospital.long || hospital['좌표(X)'] || hospital.longitude || 0);
-                
+
                 return {
                     id: hospital.id || index + 1,
                     name: hospital.name || hospital['요양기관명'] || '이름 없음',
@@ -215,22 +212,21 @@ const MapScreen = ({ navigation, route }) => {
                     latitude: lat,
                     longitude: long,
                     department: hospital.department || '',
-                    type: hospital.type || 'general'
+                    type: hospital.type || 'general',
                 };
             }).filter(hospital => {
-                const isValid = hospital.latitude !== 0 && 
-                              hospital.longitude !== 0 && 
-                              !isNaN(hospital.latitude) && 
-                              !isNaN(hospital.longitude) &&
-                              hospital.latitude >= -90 && hospital.latitude <= 90 &&
-                              hospital.longitude >= -180 && hospital.longitude <= 180;
-                
+                const isValid = hospital.latitude !== 0 &&
+                    hospital.longitude !== 0 &&
+                    !isNaN(hospital.latitude) &&
+                    !isNaN(hospital.longitude) &&
+                    hospital.latitude >= -90 && hospital.latitude <= 90 &&
+                    hospital.longitude >= -180 && hospital.longitude <= 180;
                 return isValid;
             });
 
             setHospitals(hospitalData);
             console.log(`${hospitalData.length}개의 유효한 병원 데이터를 불러왔습니다.`);
-            
+
         } catch (error) {
             console.error('병원 데이터 로딩 실패:', error);
             setHospitals([]);
@@ -240,7 +236,7 @@ const MapScreen = ({ navigation, route }) => {
         }
     }, [hospitalType]);
 
-    // 거리 계산 함수
+    // 거리 계산
     const calculateDistance = (lat1, lon1, lat2, lon2) => {
         const R = 6371;
         const dLat = (lat2 - lat1) * Math.PI / 180;
@@ -255,16 +251,16 @@ const MapScreen = ({ navigation, route }) => {
 
     // 특정 위치 기준으로 가까운 병원 80개 찾기
     const findNearbyHospitals = useCallback((centerLat, centerLng) => {
-        if (hospitals.length === 0) return [];
+        if (hospitals.length === 0) { return []; }
 
         console.log(`병원 검색 시작 - 중심: ${centerLat}, ${centerLng}`);
-        
+
         const hospitalsWithDistance = hospitals
             .map(hospital => ({
                 ...hospital,
                 distance: calculateDistance(centerLat, centerLng, hospital.latitude, hospital.longitude),
-                distanceFromUser: currentLocation ? 
-                    calculateDistance(currentLocation.latitude, currentLocation.longitude, hospital.latitude, hospital.longitude) : 0
+                distanceFromUser: currentLocation ?
+                    calculateDistance(currentLocation.latitude, currentLocation.longitude, hospital.latitude, hospital.longitude) : 0,
             }))
             .sort((a, b) => a.distance - b.distance)
             .slice(0, 80);
@@ -273,7 +269,6 @@ const MapScreen = ({ navigation, route }) => {
         return hospitalsWithDistance;
     }, [hospitals, currentLocation]);
 
-    // 현재 위치 설정시 초기 병원 검색
     useEffect(() => {
         if (currentLocation && hospitals.length > 0) {
             console.log('현재 위치 기준으로 초기 병원 검색');
@@ -283,12 +278,10 @@ const MapScreen = ({ navigation, route }) => {
         }
     }, [currentLocation, hospitals, findNearbyHospitals]);
 
-    // 병원 데이터 로드
     useEffect(() => {
         fetchHospitals();
     }, [fetchHospitals]);
 
-    // 위치 권한 요청
     const requestLocationPermission = async () => {
         if (Platform.OS === 'android') {
             try {
@@ -340,21 +333,20 @@ const MapScreen = ({ navigation, route }) => {
         );
     };
 
-    // 현재 위치 버튼 클릭 - 현재 카메라 중앙 기준으로 병원 검색
     const moveToCurrentLocation = () => {
         console.log('📍 아이콘 클릭 - 현재 카메라 중앙 기준 병원 검색');
-        
+
         if (mapRef && mapRef.getCameraPosition) {
             mapRef.getCameraPosition().then((camera) => {
                 const centerLat = camera.latitude;
                 const centerLng = camera.longitude;
-                
+
                 console.log('현재 지도 중앙:', centerLat, centerLng);
-                
+
                 setSearchCenter({ latitude: centerLat, longitude: centerLng });
                 const nearby = findNearbyHospitals(centerLat, centerLng);
                 setNearbyHospitals(nearby);
-                
+
                 console.log(`지도 중앙 기준 병원 ${nearby.length}개 검색 완료`);
             }).catch((error) => {
                 console.error('카메라 위치 가져오기 실패:', error);
@@ -364,18 +356,17 @@ const MapScreen = ({ navigation, route }) => {
             console.log('currentCamera 사용:', currentCamera);
             const centerLat = currentCamera.latitude;
             const centerLng = currentCamera.longitude;
-            
+
             setSearchCenter({ latitude: centerLat, longitude: centerLng });
             const nearby = findNearbyHospitals(centerLat, centerLng);
             setNearbyHospitals(nearby);
-            
+
             console.log(`카메라 중앙 기준 병원 ${nearby.length}개 검색 완료`);
         } else {
             fallbackToCurrentLocation();
         }
     };
 
-    // 폴백: 현재 위치 기준 검색
     const fallbackToCurrentLocation = () => {
         console.log('폴백: 현재 위치 기준 검색');
         if (currentLocation) {
@@ -385,30 +376,27 @@ const MapScreen = ({ navigation, route }) => {
         }
     };
 
-    // 지도 클릭 시 해당 위치 기준으로 병원 검색
     const handleMapTap = (event) => {
         const { latitude, longitude } = event;
         console.log('지도 클릭:', latitude, longitude);
-        
+
         setSearchCenter({ latitude, longitude });
         const nearby = findNearbyHospitals(latitude, longitude);
         setNearbyHospitals(nearby);
     };
 
-    // 병원 마커 클릭 시 모달 열기
     const handleHospitalMarkerTap = (hospital) => {
         console.log(`${hospital.name} 클릭됨`);
         setSelectedHospital(hospital);
         setModalVisible(true);
     };
 
-    // 전화 걸기 함수
     const makePhoneCall = (phoneNumber) => {
         if (!phoneNumber) {
             console.log('전화번호가 없습니다.');
             return;
         }
-        
+
         const cleanNumber = phoneNumber.replace(/[^0-9]/g, '');
         if (cleanNumber.length === 0) {
             console.log('유효하지 않은 전화번호입니다.');
@@ -419,7 +407,6 @@ const MapScreen = ({ navigation, route }) => {
         setModalVisible(false);
     };
 
-    // 모달 닫기
     const closeModal = () => {
         setModalVisible(false);
         setSelectedHospital(null);
@@ -448,8 +435,8 @@ const MapScreen = ({ navigation, route }) => {
             <SafeView>
                 <LoadingContainer>
                     <LoadingText>
-                        {hospitalLoading ? 
-                            `${hospitalType} 데이터를 불러오는 중...` : 
+                        {hospitalLoading ?
+                            `${hospitalType} 데이터를 불러오는 중...` :
                             '지도를 불러오는 중...'
                         }
                     </LoadingText>
@@ -500,8 +487,8 @@ const MapScreen = ({ navigation, route }) => {
 
                         {/* 검색 중심점 마커 (현재 위치와 다를 때만 표시) */}
                         {searchCenter && 
-                         (searchCenter.latitude !== currentLocation.latitude || 
-                          searchCenter.longitude !== currentLocation.longitude) && (
+                            (searchCenter.latitude !== currentLocation.latitude ||
+                            searchCenter.longitude !== currentLocation.longitude) && (
                             <NaverMapMarkerOverlay
                                 latitude={searchCenter.latitude}
                                 longitude={searchCenter.longitude}
@@ -557,7 +544,6 @@ const MapScreen = ({ navigation, route }) => {
                 </MapContainer>
             </Container>
 
-            {/* 병원 정보 모달 */}
             <Modal
                 animationType="fade"
                 transparent={true}
@@ -569,28 +555,28 @@ const MapScreen = ({ navigation, route }) => {
                         <ModalHeader>
                             <ModalTitle>{selectedHospital?.name || '병원 정보'}</ModalTitle>
                         </ModalHeader>
-                        
+
                         <ModalContent>
                             <InfoRow>
                                 <InfoLabel>주소</InfoLabel>
                                 <InfoText>{selectedHospital?.address || '정보 없음'}</InfoText>
                             </InfoRow>
-                            
+
                             <InfoRow>
                                 <InfoLabel>전화</InfoLabel>
                                 <InfoText>{selectedHospital?.telephone || '정보 없음'}</InfoText>
                             </InfoRow>
-                            
+
                             <InfoRow>
                                 <InfoLabel>거리</InfoLabel>
                                 <InfoText>
-                                    {selectedHospital?.distanceFromUser ? 
-                                        `${selectedHospital.distanceFromUser.toFixed(1)}km` : 
+                                    {selectedHospital?.distanceFromUser ?
+                                        `${selectedHospital.distanceFromUser.toFixed(1)}km` :
                                         '알 수 없음'
                                     }
                                 </InfoText>
                             </InfoRow>
-                            
+
                             {selectedHospital?.post && (
                                 <InfoRow>
                                     <InfoLabel>우편번호</InfoLabel>
@@ -605,15 +591,15 @@ const MapScreen = ({ navigation, route }) => {
                                 </InfoRow>
                             )}
                         </ModalContent>
-                        
+
                         <ModalButtons>
                             <ModalButton onPress={closeModal}>
                                 <ModalButtonText>닫기</ModalButtonText>
                             </ModalButton>
-                            
+
                             {selectedHospital?.telephone && (
-                                <ModalButton 
-                                    primary 
+                                <ModalButton
+                                    primary
                                     onPress={() => makePhoneCall(selectedHospital.telephone)}
                                 >
                                     <ModalButtonText primary>전화하기</ModalButtonText>

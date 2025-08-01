@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { ScrollView, TextInput, KeyboardAvoidingView, Platform, TouchableOpacity, Image, Keyboard } from 'react-native';
+import { ScrollView, KeyboardAvoidingView, Platform, TouchableOpacity, Image, Keyboard } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import styled from 'styled-components/native';
 import Colors from '../../styles/Colors';

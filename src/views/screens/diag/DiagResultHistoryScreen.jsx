@@ -160,43 +160,37 @@ const DiagResultHistoryScreen = ({ navigation }) => {
     const loadDiagHistory = async () => {
         try {
             setLoading(true);
-            // 최근 365일 내의 모든 채팅 기록을 가져옴
             const response = await getAllChats();
-            
+
             if (response && response.success && response.data) {
-                // 진단 관련 채팅만 필터링 (temp, ecg 값이 있는 질문들)
                 const diagData = [];
-                
+
                 response.data.forEach(chatRoom => {
                     chatRoom.history.forEach(comment => {
                         if (comment.is_question && 
                             (comment.temp !== null && comment.temp !== 0) ||
                             (comment.ecg !== null && comment.ecg !== -1)) {
-                            
-                            // 해당 질문에 대한 답변 찾기
+
                             const answerIndex = chatRoom.history.findIndex(
-                                c => c.content_id > comment.content_id && 
-                                     !c.is_question
+                                c => c.content_id > comment.content_id && !c.is_question
                             );
-                            
-                            const answer = answerIndex !== -1 ? 
-                                chatRoom.history[answerIndex] : null;
-                            
+
+                            const answer = answerIndex !== -1 ? chatRoom.history[answerIndex] : null;
+
                             diagData.push({
                                 chat_id: chatRoom.chat_id,
                                 question: comment,
                                 answer: answer,
-                                chatTitle: chatRoom.title
+                                chatTitle: chatRoom.title,
                             });
                         }
                     });
                 });
-                
-                // 최신순으로 정렬
-                diagData.sort((a, b) => 
+
+                diagData.sort((a, b) =>
                     new Date(b.question.created_at) - new Date(a.question.created_at)
                 );
-                
+
                 setDiagHistory(diagData);
             }
         } catch (error) {
@@ -212,7 +206,7 @@ const DiagResultHistoryScreen = ({ navigation }) => {
         const now = new Date();
         const diffTime = Math.abs(now - date);
         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-        
+
         if (diffDays === 1) {
             return '오늘';
         } else if (diffDays === 2) {
@@ -226,15 +220,13 @@ const DiagResultHistoryScreen = ({ navigation }) => {
 
     const getEcgText = (ecgValue) => {
         const ecgOptions = ['정상', '심방성 부정맥 의심', '심실성 부정맥 의심', '융합 박동', '알 수 없음'];
-        return ecgValue >= 0 && ecgValue < ecgOptions.length ? 
-               ecgOptions[ecgValue] : '미기록';
+        return ecgValue >= 0 && ecgValue < ecgOptions.length ? ecgOptions[ecgValue] : '미기록';
     };
 
     const handleDiagPress = (item) => {
-        // 해당 채팅방으로 이동
         navigation.navigate('ChatHistory', {
             chatId: item.chat_id,
-            chatTitle: item.chatTitle
+            chatTitle: item.chatTitle,
         });
     };
 
@@ -248,19 +240,19 @@ const DiagResultHistoryScreen = ({ navigation }) => {
                     </DiagBadgeText>
                 </DiagBadge>
             </DiagHistoryHeader>
-            
+
             <DiagContent>
                 <DiagQuestion numberOfLines={2}>
                     {item.question.content}
                 </DiagQuestion>
-                
+
                 {item.answer && (
                     <DiagAnswer numberOfLines={3}>
                         {item.answer.content}
                     </DiagAnswer>
                 )}
             </DiagContent>
-            
+
             <DiagValues>
                 <DiagValueItem>
                     <DiagValueLabel>체온</DiagValueLabel>
@@ -268,7 +260,7 @@ const DiagResultHistoryScreen = ({ navigation }) => {
                         {item.question.temp ? `${item.question.temp}°C` : '미기록'}
                     </DiagValueText>
                 </DiagValueItem>
-                
+
                 <DiagValueItem>
                     <DiagValueLabel>심전도</DiagValueLabel>
                     <DiagValueText type="ecg">
@@ -301,7 +293,7 @@ const DiagResultHistoryScreen = ({ navigation }) => {
             <Header>
                 <HeaderTitle>검사 기록</HeaderTitle>
             </Header>
-            
+
             <DiagHistoryContainer>
                 {diagHistory.length > 0 ? (
                     <FlatList
@@ -312,8 +304,8 @@ const DiagResultHistoryScreen = ({ navigation }) => {
                     />
                 ) : (
                     <EmptyContainer>
-                        <EmptyImage 
-                            source={require('../../../assets/diag.png')} 
+                        <EmptyImage
+                            source={require('../../../assets/diag.png')}
                             resizeMode="contain"
                         />
                         <EmptyText>

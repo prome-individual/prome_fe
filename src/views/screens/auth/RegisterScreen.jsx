@@ -153,16 +153,14 @@ const RegisterScreen = ({ navigation }) => {
 
     const { enableFullScreen, disableFullScreen } = useFullScreen();
 
-    // 랜덤 숫자 생성 함수 (6자리)
+    // 랜덤 숫자 생성 (test000000)
     const generateRandomNumber = () => {
         return Math.floor(100000 + Math.random() * 900000); // 100000~999999
     };
 
     useEffect(() => {
-        // 풀스크린 활성화
         enableFullScreen();
 
-        // 키보드 이벤트 리스너
         const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
             setKeyboardVisible(true);
         });

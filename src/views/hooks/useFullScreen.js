@@ -6,7 +6,6 @@ const useFullScreen = () => {
     console.log('useFullScreen: Platform.OS =', Platform.OS);
     if (Platform.OS === 'android') {
       console.log('useFullScreen: Setting up Android StatusBar');
-      // StatusBar는 보이게, 투명도 설정
       StatusBar.setBackgroundColor('transparent', true);
       StatusBar.setTranslucent(true);
       StatusBar.setBarStyle('dark-content');
@@ -18,7 +17,7 @@ const useFullScreen = () => {
     console.log('useFullScreen: enableFullScreen called');
     if (Platform.OS === 'android') {
       console.log('useFullScreen: Enabling fullscreen for Android');
-      StatusBar.setHidden(false); // StatusBar는 유지
+      StatusBar.setHidden(false);
     }
   };
 
